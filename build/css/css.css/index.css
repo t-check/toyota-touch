@@ -28,7 +28,43 @@ body,
   background-color: black;
   color: white;
   text-align: center;
+  font-size: 60px;
+}
+.video-file-list ul {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  -webkit-padding-start: 0;
+  list-style-type: none;
+}
+.video-file-list ul li {
+  margin-left: 10%;
+  margin-right: 10%;
 }
 .video-file-list ul li.selected {
   background-color: blue;
+}
+.video-full-screen-main-menu-gui {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+  background-color: black;
+  color: white;
+  text-align: center;
+  font-size: 60px;
+}
+.video-full-screen-main-menu-gui .google-maps-starter {
+  width: 30%;
+  height: 30%;
+  background-color: #bc1c48;
+}
+.video-full-screen-main-menu-gui .google-maps-starter.selected {
+  border: 5px solid blue;
+  width: calc(30% - 10px);
+  height: calc(30% - 10px);
 }

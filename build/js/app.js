@@ -20660,6 +20660,11 @@
 })(function (React) {
   return React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
 });
+window.onload = function () {
+    const element = React.createElement(TouchPlayerWrapper, null);
+
+    ReactDOM.render(element, document.getElementById('body'));
+};
 class TouchPlayerWrapper extends React.Component {
     constructor(props) {
         super(props);
@@ -20670,7 +20675,8 @@ class TouchPlayerWrapper extends React.Component {
             },
             videoFileList_visible: false,
             videoFileList_selectedIndex: 0,
-            videoFileList_files: [{ idx: 0, name: 'test' }, { idx: 1, name: 'test2' }]
+            videoFileList_files: [{ idx: 0, name: 'test' }, { idx: 1, name: 'test2' }, { idx: 2, name: 'fdas' }, { idx: 3, name: 'fdas' }, { idx: 4, name: 'gre gfsd' }, { idx: 5, name: 'gsdf ' }, { idx: 6, name: 'fdsgsdf' }, { idx: 7, name: 'jzzjtr' }, { idx: 8, name: 'jzjtzrj' }, { idx: 9, name: 'ztrj jztz' }, { idx: 10, name: 'ztrj jjjjtr zjr' }, { idx: 11, name: 'test2' }, { idx: 12, name: 'test2' }, { idx: 13, name: 'test2' }, { idx: 14, name: 'test2' }, { idx: 15, name: 'test2' }, { idx: 16, name: 'test2' }, { idx: 17, name: 'test2' }, { idx: 18, name: 'test2' }, { idx: 19, name: 'test2' }, { idx: 20, name: 'test2' }, { idx: 21, name: 'test2' }, { idx: 22, name: 'test2' }, { idx: 23, name: 'test2' }, { idx: 24, name: 'test2' }, { idx: 25, name: 'test2' }],
+            videoFullScreenMainMenuGui_visible: false
         };
 
         var state = new VideoFullScreenState(this);
@@ -20707,7 +20713,8 @@ class TouchPlayerWrapper extends React.Component {
             'div',
             { className: 'touch-player-wrapper' },
             React.createElement(VideoPlayer, { ref: e => this.videoPlayer = e }),
-            React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, ref: e => this.videoFileList = e })
+            React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, ref: e => this.videoFileList = e }),
+            React.createElement(VideoFullScreenMainMenuGui, { visible: this.state.videoFullScreenMainMenuGui_visible })
         );
     }
 }
@@ -20755,6 +20762,23 @@ class VideoFileList extends React.Component {
     }
 
 }
+class VideoFullScreenMainMenuGui extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return React.createElement(
+            "div",
+            { className: "video-full-screen-main-menu-gui " + (this.props.visible == true ? "visible" : "hidden") },
+            React.createElement(
+                "div",
+                { className: "google-maps-starter selected" },
+                "Maps"
+            )
+        );
+    }
+}
 class VideoPlayer extends React.Component {
     render() {
         return React.createElement(
@@ -20764,11 +20788,6 @@ class VideoPlayer extends React.Component {
         );
     }
 }
-window.onload = function () {
-    const element = React.createElement(TouchPlayerWrapper, null);
-
-    ReactDOM.render(element, document.getElementById('body'));
-};
 class VideoFullScreenWithPlaylist {
     constructor(touchPlayerWrapperContext) {
         this.touchPlayerWrapperContext = touchPlayerWrapperContext;
@@ -20812,6 +20831,44 @@ class VideoFullScreenWithPlaylist {
         return new VideoFullScreenState(this.touchPlayerWrapperContext);
     }
 }
+class VideoFullScreenStateMainMenu {
+    constructor(touchPlayerWrapperContext) {
+        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
+
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.ok = this.ok.bind(this);
+        this.back = this.back.bind(this);
+
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: true
+        });
+    }
+
+    left() {
+        return this;
+    }
+    right() {
+        return this;
+    }
+    up() {
+        return this;
+    }
+    down() {
+        return this;
+    }
+    ok() {
+        return this;
+    }
+    back() {
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: false
+        });
+        return new VideoFullScreenState(this.touchPlayerWrapperContext);
+    }
+}
 class VideoFullScreenState {
     constructor(touchPlayerWrapperContext) {
         this.touchPlayerWrapperContext = touchPlayerWrapperContext;
@@ -20840,6 +20897,6 @@ class VideoFullScreenState {
         return new VideoFullScreenWithPlaylist(this.touchPlayerWrapperContext);
     }
     back() {
-        return this;
+        return new VideoFullScreenStateMainMenu(this.touchPlayerWrapperContext);
     }
 }

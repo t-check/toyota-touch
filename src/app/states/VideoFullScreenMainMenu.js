@@ -1,4 +1,4 @@
-class VideoFullScreenState{
+class VideoFullScreenStateMainMenu{
     constructor(touchPlayerWrapperContext){
         this.touchPlayerWrapperContext = touchPlayerWrapperContext;
 
@@ -8,6 +8,10 @@ class VideoFullScreenState{
         this.down = this.down.bind(this);
         this.ok = this.ok.bind(this);
         this.back = this.back.bind(this);
+
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: true
+        });
     }
 
     left(){
@@ -23,9 +27,12 @@ class VideoFullScreenState{
         return this;
     }
     ok(){
-        return new VideoFullScreenWithPlaylist(this.touchPlayerWrapperContext);
+        return this;
     }
     back(){
-        return new VideoFullScreenStateMainMenu(this.touchPlayerWrapperContext)
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: false
+        });
+        return new VideoFullScreenState(this.touchPlayerWrapperContext);
     }
 }
