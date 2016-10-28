@@ -15,7 +15,7 @@ class TouchPlayerWrapper extends React.Component{
         }
 
         var state = new VideoFullScreenState(this);
-
+        
         document.body.addEventListener('keypress', function(event){
             
             if (event.keyCode == 115){
@@ -42,15 +42,16 @@ class TouchPlayerWrapper extends React.Component{
                 // y key
                 state = state.back();
             }
+
+            this.videoPlayer = null;
+            this.videoFileList = null;
         })
-
     }
-
 
     render(){
         return <div className="touch-player-wrapper">
-            <VideoPlayer/>
-            <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} selectedIndex={this.state.videoFileList_selectedIndex}/>
-        </div>;
+                <VideoPlayer ref={(e) => this.videoPlayer = e}/>
+                <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} ref={(e) => this.videoFileList=e}/>
+            </div>;
     }
 }

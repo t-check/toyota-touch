@@ -20660,11 +20660,6 @@
 })(function (React) {
   return React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
 });
-window.onload = function () {
-    const element = React.createElement(TouchPlayerWrapper, null);
-
-    ReactDOM.render(element, document.getElementById('body'));
-};
 class TouchPlayerWrapper extends React.Component {
     constructor(props) {
         super(props);
@@ -20701,6 +20696,9 @@ class TouchPlayerWrapper extends React.Component {
                 // y key
                 state = state.back();
             }
+
+            this.videoPlayer = null;
+            this.videoFileList = null;
         });
     }
 
@@ -20708,8 +20706,8 @@ class TouchPlayerWrapper extends React.Component {
         return React.createElement(
             'div',
             { className: 'touch-player-wrapper' },
-            React.createElement(VideoPlayer, null),
-            React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, selectedIndex: this.state.videoFileList_selectedIndex })
+            React.createElement(VideoPlayer, { ref: e => this.videoPlayer = e }),
+            React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, ref: e => this.videoFileList = e })
         );
     }
 }
@@ -20717,7 +20715,29 @@ class VideoFileList extends React.Component {
     constructor(props) {
         super(props);
         console.log(props);
+
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.ok = this.ok.bind(this);
+
+        this.state = { selectedIndex: 0 };
     }
+
+    up() {
+        this.setState({ selectedIndex: this.state.selectedIndex == 0 ? this.props.files.length - 1 : this.state.selectedIndex - 1 });
+    }
+    down() {
+        this.setState({ selectedIndex: (this.state.selectedIndex + 1) % this.props.files.length });
+    }
+
+    left() {}
+
+    right() {}
+
+    ok() {}
+
     render() {
         return React.createElement(
             "div",
@@ -20727,7 +20747,7 @@ class VideoFileList extends React.Component {
                 null,
                 this.props.files.map(file => React.createElement(
                     "li",
-                    { key: file.idx, value: file.name, className: this.props.selectedIndex == file.idx ? "selected" : "not-selected" },
+                    { key: file.idx, value: file.name, className: this.state.selectedIndex == file.idx ? "selected" : "not-selected" },
                     file.name
                 ))
             )
@@ -20744,6 +20764,11 @@ class VideoPlayer extends React.Component {
         );
     }
 }
+window.onload = function () {
+    const element = React.createElement(TouchPlayerWrapper, null);
+
+    ReactDOM.render(element, document.getElementById('body'));
+};
 class VideoFullScreenWithPlaylist {
     constructor(touchPlayerWrapperContext) {
         this.touchPlayerWrapperContext = touchPlayerWrapperContext;
@@ -20761,27 +20786,23 @@ class VideoFullScreenWithPlaylist {
     }
 
     left() {
+        this.touchPlayerWrapperContext.videoFileList.left();
         return this;
     }
     right() {
+        this.touchPlayerWrapperContext.videoFileList.right();
         return this;
     }
     up() {
-        debugger;
-        this.touchPlayerWrapperContext.setState({
-            videoFileList_selectedIndex: this.touchPlayerWrapperContext.state.videoFileList_selectedIndex - 1
-        });
-
+        this.touchPlayerWrapperContext.videoFileList.up();
         return this;
     }
     down() {
-        this.touchPlayerWrapperContext.setState({
-            videoFileList_selectedIndex: this.touchPlayerWrapperContext.state.videoFileList_selectedIndex + 1
-        });
-
+        this.touchPlayerWrapperContext.videoFileList.down();
         return this;
     }
     ok() {
+        this.touchPlayerWrapperContext.videoFileList.ok();
         return this;
     }
     back() {

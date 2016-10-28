@@ -18,27 +18,23 @@ class VideoFullScreenWithPlaylist{
 
 
     left(){
+        this.touchPlayerWrapperContext.videoFileList.left();
         return this;
     }
     right(){
+        this.touchPlayerWrapperContext.videoFileList.right();
         return this;
     }
     up(){
-        debugger;
-        this.touchPlayerWrapperContext.setState({
-            videoFileList_selectedIndex: this.touchPlayerWrapperContext.state.videoFileList_selectedIndex - 1
-        });
-
+        this.touchPlayerWrapperContext.videoFileList.up();
         return this;
     }
     down(){
-        this.touchPlayerWrapperContext.setState({
-            videoFileList_selectedIndex: this.touchPlayerWrapperContext.state.videoFileList_selectedIndex + 1
-        });
-
+        this.touchPlayerWrapperContext.videoFileList.down();
         return this;
     }
     ok(){
+        this.touchPlayerWrapperContext.videoFileList.ok();
         return this;
     }
     back(){
