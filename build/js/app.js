@@ -20660,11 +20660,6 @@
 })(function (React) {
   return React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
 });
-window.onload = function () {
-    const element = React.createElement(TouchPlayerWrapper, null);
-
-    ReactDOM.render(element, document.getElementById('body'));
-};
 class TouchPlayerWrapper extends React.Component {
     constructor(props) {
         super(props);
@@ -20683,23 +20678,23 @@ class TouchPlayerWrapper extends React.Component {
         var state = new VideoFullScreenState(this);
 
         document.body.addEventListener('keypress', function (event) {
-
-            if (event.keyCode == 115) {
+            console.log(event.keyCode);
+            if (event.keyCode == 115 || event.keyCode == 111) {
                 // s key
                 state = state.ok();
-            } else if (event.keyCode == 119) {
+            } else if (event.keyCode == 119 || event.keyCode == 117) {
                 // w key
                 state = state.up();
-            } else if (event.keyCode == 97) {
+            } else if (event.keyCode == 97 || event.keyCode == 108) {
                 // a key
                 state = state.left();
-            } else if (event.keyCode == 100) {
+            } else if (event.keyCode == 114) {
                 // d key
                 state = state.right();
-            } else if (event.keyCode == 120) {
+            } else if (event.keyCode == 120 || event.keyCode == 100) {
                 // x key
                 state = state.down();
-            } else if (event.keyCode == 121) {
+            } else if (event.keyCode == 121 || event.keyCode == 98) {
                 // y key
                 state = state.back();
             }
@@ -20850,6 +20845,11 @@ class VideoPlayer extends React.Component {
         );
     }
 }
+window.onload = function () {
+    const element = React.createElement(TouchPlayerWrapper, null);
+
+    ReactDOM.render(element, document.getElementById('body'));
+};
 class VideoFullScreenWithPlaylist {
     constructor(touchPlayerWrapperContext) {
         this.touchPlayerWrapperContext = touchPlayerWrapperContext;
