@@ -68,3 +68,15 @@ body,
   width: calc(30% - 10px);
   height: calc(30% - 10px);
 }
+.video-full-screen-with-map {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+}
+.video-full-screen-with-map .google-maps-map {
+  width: 100%;
+  height: 100%;
+}

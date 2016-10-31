@@ -20676,7 +20676,8 @@ class TouchPlayerWrapper extends React.Component {
             videoFileList_visible: false,
             videoFileList_selectedIndex: 0,
             videoFileList_files: [{ idx: 0, name: 'test' }, { idx: 1, name: 'test2' }, { idx: 2, name: 'fdas' }, { idx: 3, name: 'fdas' }, { idx: 4, name: 'gre gfsd' }, { idx: 5, name: 'gsdf ' }, { idx: 6, name: 'fdsgsdf' }, { idx: 7, name: 'jzzjtr' }, { idx: 8, name: 'jzjtzrj' }, { idx: 9, name: 'ztrj jztz' }, { idx: 10, name: 'ztrj jjjjtr zjr' }, { idx: 11, name: 'test2' }, { idx: 12, name: 'test2' }, { idx: 13, name: 'test2' }, { idx: 14, name: 'test2' }, { idx: 15, name: 'test2' }, { idx: 16, name: 'test2' }, { idx: 17, name: 'test2' }, { idx: 18, name: 'test2' }, { idx: 19, name: 'test2' }, { idx: 20, name: 'test2' }, { idx: 21, name: 'test2' }, { idx: 22, name: 'test2' }, { idx: 23, name: 'test2' }, { idx: 24, name: 'test2' }, { idx: 25, name: 'test2' }],
-            videoFullScreenMainMenuGui_visible: false
+            videoFullScreenMainMenuGui_visible: false,
+            videoFullScreenWithMapGui_visible: false
         };
 
         var state = new VideoFullScreenState(this);
@@ -20705,6 +20706,7 @@ class TouchPlayerWrapper extends React.Component {
 
             this.videoPlayer = null;
             this.videoFileList = null;
+            this.videoFullScreenWithMap = null;
         });
     }
 
@@ -20714,7 +20716,8 @@ class TouchPlayerWrapper extends React.Component {
             { className: 'touch-player-wrapper' },
             React.createElement(VideoPlayer, { ref: e => this.videoPlayer = e }),
             React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, ref: e => this.videoFileList = e }),
-            React.createElement(VideoFullScreenMainMenuGui, { visible: this.state.videoFullScreenMainMenuGui_visible })
+            React.createElement(VideoFullScreenMainMenuGui, { visible: this.state.videoFullScreenMainMenuGui_visible }),
+            React.createElement(VideoFullScreenWithMapGui, { visible: this.state.videoFullScreenWithMapGui_visible, ref: e => this.videoFullScreenWithMap = e })
         );
     }
 }
@@ -20776,6 +20779,65 @@ class VideoFullScreenMainMenuGui extends React.Component {
                 { className: "google-maps-starter selected" },
                 "Maps"
             )
+        );
+    }
+}
+class VideoFullScreenWithMapGui extends React.Component {
+    constructor(props) {
+        super(props);
+        this.isActive = false;
+        this.map = null;
+        this.lon = 15.9540166;
+        this.lat = 45.793876;
+        this.zoom = 16;
+
+        this.activate = this.activate.bind(this);
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.ok = this.ok.bind(this);
+    }
+
+    activate() {
+        if (this.isActive == false) {
+            this.map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: this.lat, lng: this.lon },
+                scrollwheel: false,
+                zoom: this.zoom
+            });
+
+            var trafficLayer = new google.maps.TrafficLayer();
+            trafficLayer.setMap(this.map);
+        }
+    }
+
+    up() {
+        this.lat = this.lat + 1 / (Math.pow(this.zoom, 2) / 2);
+        this.map.panTo(new google.maps.LatLng(this.lat, this.lon));
+    }
+    down() {
+        this.lat = this.lat - 1 / (Math.pow(this.zoom, 2) / 2);
+        this.map.panTo(new google.maps.LatLng(this.lat, this.lon));
+    }
+
+    left() {
+        this.lon = this.lon - 1 / (Math.pow(this.zoom, 2) / 8);
+        this.map.panTo(new google.maps.LatLng(this.lat, this.lon));
+    }
+
+    right() {
+        this.lon = this.lon + 1 / (Math.pow(this.zoom, 2) / 8);
+        this.map.panTo(new google.maps.LatLng(this.lat, this.lon));
+    }
+
+    ok() {}
+
+    render() {
+        return React.createElement(
+            "div",
+            { className: "video-full-screen-with-map " + (this.props.visible == true ? "visible" : "hidden") },
+            React.createElement("div", { className: "google-maps-map", id: "map" })
         );
     }
 }
@@ -20860,7 +20922,11 @@ class VideoFullScreenStateMainMenu {
         return this;
     }
     ok() {
-        return this;
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: false
+        });
+        return new VideoFullScreenWithMap(this.touchPlayerWrapperContext);
+        //return this;
     }
     back() {
         this.touchPlayerWrapperContext.setState({
@@ -20898,5 +20964,50 @@ class VideoFullScreenState {
     }
     back() {
         return new VideoFullScreenStateMainMenu(this.touchPlayerWrapperContext);
+    }
+}
+class VideoFullScreenWithMap {
+    constructor(touchPlayerWrapperContext) {
+        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
+
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.ok = this.ok.bind(this);
+        this.back = this.back.bind(this);
+
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenWithMapGui_visible: true
+        });
+
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.activate();
+    }
+
+    left() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.left();
+        return this;
+    }
+    right() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.right();
+        return this;
+    }
+    up() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.up();
+        return this;
+    }
+    down() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.down();
+        return this;
+    }
+    ok() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.ok();
+        return this;
+    }
+    back() {
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenWithMapGui_visible: false
+        });
+        return new VideoFullScreenState(this.touchPlayerWrapperContext);
     }
 }

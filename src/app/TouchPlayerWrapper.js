@@ -2,6 +2,7 @@ class TouchPlayerWrapper extends React.Component{
     constructor(props){
         super(props);
 
+
         this.state = {
             video:{
                 visible: true
@@ -37,6 +38,7 @@ class TouchPlayerWrapper extends React.Component{
                     {idx: 25, name: 'test2'},
                 ]
             ,videoFullScreenMainMenuGui_visible: false
+            ,videoFullScreenWithMapGui_visible: false
         }
 
         var state = new VideoFullScreenState(this);
@@ -70,6 +72,7 @@ class TouchPlayerWrapper extends React.Component{
 
             this.videoPlayer = null;
             this.videoFileList = null;
+            this.videoFullScreenWithMap = null
         })
     }
 
@@ -78,6 +81,7 @@ class TouchPlayerWrapper extends React.Component{
                 <VideoPlayer ref={(e) => this.videoPlayer = e}/>
                 <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} ref={(e) => this.videoFileList=e}/>
                 <VideoFullScreenMainMenuGui visible={this.state.videoFullScreenMainMenuGui_visible}/>
+                <VideoFullScreenWithMapGui visible={this.state.videoFullScreenWithMapGui_visible} ref={(e)=> this.videoFullScreenWithMap=e}/>
             </div>;
     }
 }
