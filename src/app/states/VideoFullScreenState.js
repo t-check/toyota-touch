@@ -23,6 +23,7 @@ class VideoFullScreenState{
         return this;
     }
     ok(){
+        //this.touchPlayerWrapperContext.videoPlayer.play('file:///Users/tomislavhorvaticek/Downloads/Aventura%20-%20Obsesion.mp4');
         return new VideoFullScreenWithPlaylist(this.touchPlayerWrapperContext);
     }
     back(){

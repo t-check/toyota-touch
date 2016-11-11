@@ -16,7 +16,7 @@ gulp.task('less', function () {
 });
 
 gulp.task('concat', ['copy-html'], function(){
-    return gulp.src(['bower_components/react/react.js', 'bower_components/react/react-dom.js', 'src/**/*.js'])
+    return gulp.src(['bower_components/react/react.js', 'bower_components/react/react-dom.js', 'bower_components/lodash/dist/loadash.min.js', 'src/**/*.js'])
         .pipe(babel({
             "plugins": ["transform-react-jsx"]
             ,compact: false

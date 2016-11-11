@@ -2,47 +2,24 @@ class TouchPlayerWrapper extends React.Component{
     constructor(props){
         super(props);
 
+        for(var i=0; i<window.files.length; i++){
+            window.files[i].idx = i;
+        }
 
         this.state = {
             video:{
                 visible: true
             },
-            videoFileList_visible: false,
+            videourl: ''
+            ,videoFileList_visible: false,
             videoFileList_selectedIndex: 0,
-            videoFileList_files: [
-                    {idx: 0, name: 'test'},
-                    {idx: 1, name: 'test2'},
-                    {idx: 2, name: 'fdas'},
-                    {idx: 3, name: 'fdas'},
-                    {idx: 4, name: 'gre gfsd'},
-                    {idx: 5, name: 'gsdf '},
-                    {idx: 6, name: 'fdsgsdf'},
-                    {idx: 7, name: 'jzzjtr'},
-                    {idx: 8, name: 'jzjtzrj'},
-                    {idx: 9, name: 'ztrj jztz'},
-                    {idx: 10, name: 'ztrj jjjjtr zjr'},
-                    {idx: 11, name: 'test2'},
-                    {idx: 12, name: 'test2'},
-                    {idx: 13, name: 'test2'},
-                    {idx: 14, name: 'test2'},
-                    {idx: 15, name: 'test2'},
-                    {idx: 16, name: 'test2'},
-                    {idx: 17, name: 'test2'},
-                    {idx: 18, name: 'test2'},
-                    {idx: 19, name: 'test2'},
-                    {idx: 20, name: 'test2'},
-                    {idx: 21, name: 'test2'},
-                    {idx: 22, name: 'test2'},
-                    {idx: 23, name: 'test2'},
-                    {idx: 24, name: 'test2'},
-                    {idx: 25, name: 'test2'},
-                ]
+            videoFileList_files: window.files
             ,videoFullScreenMainMenuGui_visible: false
             ,videoFullScreenWithMapGui_visible: false
         }
 
         var state = new VideoFullScreenState(this);
-        
+    
         document.body.addEventListener('keypress', function(event){
             console.log(event.keyCode);
             if (event.keyCode == 115 || event.keyCode == 111){
@@ -72,14 +49,21 @@ class TouchPlayerWrapper extends React.Component{
 
             this.videoPlayer = null;
             this.videoFileList = null;
-            this.videoFullScreenWithMap = null
+            this.videoFullScreenWithMap = null;
+
         })
+
+        this.playFile = this.playFile.bind(this);
+    }
+
+    playFile(file){
+        this.videoPlayer.playFile(file);
     }
 
     render(){
         return <div className="touch-player-wrapper">
-                <VideoPlayer ref={(e) => this.videoPlayer = e}/>
-                <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} ref={(e) => this.videoFileList=e}/>
+                <VideoPlayer ref={(e) => this.videoPlayer = e} />
+                <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} ref={(e) => this.videoFileList=e} playVideo={this.playFile}/>
                 <VideoFullScreenMainMenuGui visible={this.state.videoFullScreenMainMenuGui_visible}/>
                 <VideoFullScreenWithMapGui visible={this.state.videoFullScreenWithMapGui_visible} ref={(e)=> this.videoFullScreenWithMap=e}/>
             </div>;

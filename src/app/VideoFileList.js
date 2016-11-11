@@ -8,7 +8,9 @@ class VideoFileList extends React.Component{
         this.left = this.left.bind(this);
         this.right = this.right.bind(this);
         this.ok = this.ok.bind(this);
-
+        this.maxVisibleElements = 5;
+        this.topVisibleElements = Math.floor(this.maxVisibleElements/2);
+ 
         this.state = {selectedIndex: 0};
     }
 
@@ -26,17 +28,31 @@ class VideoFileList extends React.Component{
     }
 
     ok(){
-
+        this.props.playVideo(this.props.files[this.state.selectedIndex]);
     }
 
     render(){
+        let liElements = [];
+
+        for(var i=0; i<this.maxVisibleElements; i++){
+            var startIndex = this.state.selectedIndex - this.topVisibleElements;
+            var currentFile = null;
+
+            if(startIndex +i >= this.props.files.length){
+                currentFile = this.props.files[(startIndex+i)%(this.props.files.length)];
+            }
+            else if (startIndex + i >= 0){
+                currentFile = this.props.files[startIndex + i];
+            } 
+            else{
+                currentFile = this.props.files[startIndex +i + this.props.files.length];
+            }
+            liElements.push(<li key={currentFile.idx} value={currentFile.name} className={(this.state.selectedIndex == currentFile.idx ? "selected" : "not-selected")}>{currentFile.name}</li>)
+        }
+
         return <div className={"video-file-list " + (this.props.visible == true ? "visible" : "hidden")}>
             <ul>
-                {
-                    this.props.files.map((file) =>
-                    <li key={file.idx} value={file.name} className={(this.state.selectedIndex == file.idx ? "selected" : "not-selected")}>{file.name}</li>
-                    )
-                }
+                {liElements}
             </ul>
         </div>;
 

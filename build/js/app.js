@@ -20664,13 +20664,18 @@ class TouchPlayerWrapper extends React.Component {
     constructor(props) {
         super(props);
 
+        for (var i = 0; i < window.files.length; i++) {
+            window.files[i].idx = i;
+        }
+
         this.state = {
             video: {
                 visible: true
             },
+            videourl: '',
             videoFileList_visible: false,
             videoFileList_selectedIndex: 0,
-            videoFileList_files: [{ idx: 0, name: 'test' }, { idx: 1, name: 'test2' }, { idx: 2, name: 'fdas' }, { idx: 3, name: 'fdas' }, { idx: 4, name: 'gre gfsd' }, { idx: 5, name: 'gsdf ' }, { idx: 6, name: 'fdsgsdf' }, { idx: 7, name: 'jzzjtr' }, { idx: 8, name: 'jzjtzrj' }, { idx: 9, name: 'ztrj jztz' }, { idx: 10, name: 'ztrj jjjjtr zjr' }, { idx: 11, name: 'test2' }, { idx: 12, name: 'test2' }, { idx: 13, name: 'test2' }, { idx: 14, name: 'test2' }, { idx: 15, name: 'test2' }, { idx: 16, name: 'test2' }, { idx: 17, name: 'test2' }, { idx: 18, name: 'test2' }, { idx: 19, name: 'test2' }, { idx: 20, name: 'test2' }, { idx: 21, name: 'test2' }, { idx: 22, name: 'test2' }, { idx: 23, name: 'test2' }, { idx: 24, name: 'test2' }, { idx: 25, name: 'test2' }],
+            videoFileList_files: window.files,
             videoFullScreenMainMenuGui_visible: false,
             videoFullScreenWithMapGui_visible: false
         };
@@ -20703,6 +20708,12 @@ class TouchPlayerWrapper extends React.Component {
             this.videoFileList = null;
             this.videoFullScreenWithMap = null;
         });
+
+        this.playFile = this.playFile.bind(this);
+    }
+
+    playFile(file) {
+        this.videoPlayer.playFile(file);
     }
 
     render() {
@@ -20710,7 +20721,7 @@ class TouchPlayerWrapper extends React.Component {
             'div',
             { className: 'touch-player-wrapper' },
             React.createElement(VideoPlayer, { ref: e => this.videoPlayer = e }),
-            React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, ref: e => this.videoFileList = e }),
+            React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, ref: e => this.videoFileList = e, playVideo: this.playFile }),
             React.createElement(VideoFullScreenMainMenuGui, { visible: this.state.videoFullScreenMainMenuGui_visible }),
             React.createElement(VideoFullScreenWithMapGui, { visible: this.state.videoFullScreenWithMapGui_visible, ref: e => this.videoFullScreenWithMap = e })
         );
@@ -20726,6 +20737,8 @@ class VideoFileList extends React.Component {
         this.left = this.left.bind(this);
         this.right = this.right.bind(this);
         this.ok = this.ok.bind(this);
+        this.maxVisibleElements = 5;
+        this.topVisibleElements = Math.floor(this.maxVisibleElements / 2);
 
         this.state = { selectedIndex: 0 };
     }
@@ -20741,20 +20754,38 @@ class VideoFileList extends React.Component {
 
     right() {}
 
-    ok() {}
+    ok() {
+        this.props.playVideo(this.props.files[this.state.selectedIndex]);
+    }
 
     render() {
+        let liElements = [];
+
+        for (var i = 0; i < this.maxVisibleElements; i++) {
+            var startIndex = this.state.selectedIndex - this.topVisibleElements;
+            var currentFile = null;
+
+            if (startIndex + i >= this.props.files.length) {
+                currentFile = this.props.files[(startIndex + i) % this.props.files.length];
+            } else if (startIndex + i >= 0) {
+                currentFile = this.props.files[startIndex + i];
+            } else {
+                currentFile = this.props.files[startIndex + i + this.props.files.length];
+            }
+            liElements.push(React.createElement(
+                "li",
+                { key: currentFile.idx, value: currentFile.name, className: this.state.selectedIndex == currentFile.idx ? "selected" : "not-selected" },
+                currentFile.name
+            ));
+        }
+
         return React.createElement(
             "div",
             { className: "video-file-list " + (this.props.visible == true ? "visible" : "hidden") },
             React.createElement(
                 "ul",
                 null,
-                this.props.files.map(file => React.createElement(
-                    "li",
-                    { key: file.idx, value: file.name, className: this.state.selectedIndex == file.idx ? "selected" : "not-selected" },
-                    file.name
-                ))
+                liElements
             )
         );
     }
@@ -20837,10 +20868,37 @@ class VideoFullScreenWithMapGui extends React.Component {
     }
 }
 class VideoPlayer extends React.Component {
+    constructor(props) {
+        super(props);
+        console.log(props);
+
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.ok = this.ok.bind(this);
+        this.playFile = this.playFile.bind(this);
+
+        this.state = { selectedIndex: 0 };
+    }
+
+    up() {}
+    down() {}
+
+    left() {}
+
+    right() {}
+
+    ok() {}
+
+    playFile(file) {
+        this.videoElement.src = file.name;
+    }
+
     render() {
         return React.createElement(
             "video",
-            { autoPlay: true, controls: true },
+            { autoPlay: true, controls: true, ref: e => this.videoElement = e },
             React.createElement("source", { src: "file:///media/pi/9CC8BB5BC8BB327E/USA/Lana%20Jurcevic%20-%20VRTI%20MI%20SE%20feat.%20Ante%20Cash.mp4", type: "video/mp4" })
         );
     }
@@ -20960,6 +21018,7 @@ class VideoFullScreenState {
         return this;
     }
     ok() {
+        //this.touchPlayerWrapperContext.videoPlayer.play('file:///Users/tomislavhorvaticek/Downloads/Aventura%20-%20Obsesion.mp4');
         return new VideoFullScreenWithPlaylist(this.touchPlayerWrapperContext);
     }
     back() {
