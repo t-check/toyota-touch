@@ -66,6 +66,7 @@ class TouchPlayerWrapper extends React.Component{
                 <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} ref={(e) => this.videoFileList=e} playVideo={this.playFile}/>
                 <VideoFullScreenMainMenuGui visible={this.state.videoFullScreenMainMenuGui_visible}/>
                 <VideoFullScreenWithMapGui visible={this.state.videoFullScreenWithMapGui_visible} ref={(e)=> this.videoFullScreenWithMap=e}/>
+                <BoardView />
             </div>;
     }
 }
