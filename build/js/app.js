@@ -20660,6 +20660,11 @@
 })(function (React) {
   return React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
 });
+window.onload = function () {
+    const element = React.createElement(TouchPlayerWrapper, null);
+
+    ReactDOM.render(element, document.getElementById('body'));
+};
 class TouchPlayerWrapper extends React.Component {
     constructor(props) {
         super(props);
@@ -20677,7 +20682,8 @@ class TouchPlayerWrapper extends React.Component {
             videoFileList_selectedIndex: 0,
             videoFileList_files: window.files,
             videoFullScreenMainMenuGui_visible: false,
-            videoFullScreenWithMapGui_visible: false
+            videoFullScreenWithMapGui_visible: false,
+            game2048_visible: false
         };
 
         var state = new VideoFullScreenState(this);
@@ -20707,6 +20713,7 @@ class TouchPlayerWrapper extends React.Component {
             this.videoPlayer = null;
             this.videoFileList = null;
             this.videoFullScreenWithMap = null;
+            this.game2048 = null;
         });
 
         this.playFile = this.playFile.bind(this);
@@ -20724,7 +20731,7 @@ class TouchPlayerWrapper extends React.Component {
             React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, ref: e => this.videoFileList = e, playVideo: this.playFile }),
             React.createElement(VideoFullScreenMainMenuGui, { visible: this.state.videoFullScreenMainMenuGui_visible }),
             React.createElement(VideoFullScreenWithMapGui, { visible: this.state.videoFullScreenWithMapGui_visible, ref: e => this.videoFullScreenWithMap = e }),
-            React.createElement(BoardView, null)
+            React.createElement(BoardView, { visible: this.state.game2048_visible, ref: e => this.game2048 = e })
         );
     }
 }
@@ -20904,11 +20911,6 @@ class VideoPlayer extends React.Component {
         );
     }
 }
-window.onload = function () {
-    const element = React.createElement(TouchPlayerWrapper, null);
-
-    ReactDOM.render(element, document.getElementById('body'));
-};
 var rotateLeft = function (matrix) {
   var rows = matrix.length;
   var columns = matrix[0].length;
@@ -21091,7 +21093,26 @@ class BoardView extends React.Component {
   constructor(props) {
     super(props);
     this.state = { board: new Board() };
+
+    this.up = this.up.bind(this);
+    this.down = this.down.bind(this);
+    this.left = this.left.bind(this);
+    this.right = this.right.bind(this);
+    //this.ok = this.ok.bind(this);
   }
+  up() {
+    this.setState({ board: this.state.board.move(1) });
+  }
+  down() {
+    this.setState({ board: this.state.board.move(3) });
+  }
+  left() {
+    this.setState({ board: this.state.board.move(0) });
+  }
+  right() {
+    this.setState({ board: this.state.board.move(2) });
+  }
+
   restartGame() {
     this.setState({ board: new Board() });
   }
@@ -21102,8 +21123,7 @@ class BoardView extends React.Component {
     if (event.keyCode >= 37 && event.keyCode <= 40) {
       event.preventDefault();
       var direction = event.keyCode - 37;
-      console.log(event.keyCode);
-      this.setState({ board: this.state.board.move(direction) });
+      //this.setState({board: this.state.board.move(direction)});
     }
   }
   handleTouchStart(event) {
@@ -21153,7 +21173,7 @@ class BoardView extends React.Component {
     var tiles = this.state.board.tiles.filter(tile => tile.value != 0).map(tile => React.createElement(TileView, { tile: tile, key: tile.id }));
     return React.createElement(
       'div',
-      { className: 'board', onTouchStart: this.handleTouchStart.bind(this), onTouchEnd: this.handleTouchEnd.bind(this), tabIndex: '1' },
+      { className: "board " + (this.props.visible == true ? "visible" : "hidden"), onTouchStart: this.handleTouchStart.bind(this), onTouchEnd: this.handleTouchEnd.bind(this), tabIndex: '1' },
       cells,
       tiles,
       React.createElement(GameEndOverlay, { board: this.state.board, onRestart: this.restartGame.bind(this) })
@@ -21223,7 +21243,7 @@ var GameEndOverlay = ({ board, onRestart }) => {
   }
   return React.createElement(
     'div',
-    { className: 'overlay' },
+    { className: "overlay" },
     React.createElement(
       'p',
       { className: 'message' },
@@ -21238,6 +21258,49 @@ var GameEndOverlay = ({ board, onRestart }) => {
 };
 
 //ReactDOM.render(<BoardView />, document.getElementById('boardDiv'));
+class Game2048Screen {
+    constructor(touchPlayerWrapperContext) {
+        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
+
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.ok = this.ok.bind(this);
+        this.back = this.back.bind(this);
+
+        this.touchPlayerWrapperContext.setState({
+            game2048_visible: true
+        });
+    }
+
+    left() {
+        this.touchPlayerWrapperContext.game2048.left();
+        return this;
+    }
+    right() {
+        this.touchPlayerWrapperContext.game2048.right();
+        return this;
+    }
+    up() {
+        this.touchPlayerWrapperContext.game2048.up();
+        return this;
+    }
+    down() {
+        this.touchPlayerWrapperContext.game2048.down();
+        return this;
+    }
+    ok() {
+        this.touchPlayerWrapperContext.game2048.ok();
+        return this;
+    }
+    back() {
+        this.touchPlayerWrapperContext.setState({
+            game2048_visible: false
+        });
+        return new VideoFullScreenState(this.touchPlayerWrapperContext);
+    }
+}
 class VideoFullScreenWithPlaylist {
     constructor(touchPlayerWrapperContext) {
         this.touchPlayerWrapperContext = touchPlayerWrapperContext;
@@ -21298,7 +21361,10 @@ class VideoFullScreenStateMainMenu {
     }
 
     left() {
-        return this;
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: false
+        });
+        return new Game2048Screen(this.touchPlayerWrapperContext);
     }
     right() {
         return this;

@@ -2,7 +2,26 @@ class BoardView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {board: new Board};
+
+    this.up = this.up.bind(this);
+    this.down = this.down.bind(this);
+    this.left = this.left.bind(this);
+    this.right = this.right.bind(this);
+    //this.ok = this.ok.bind(this);
   }
+  up(){
+    this.setState({board: this.state.board.move(1)});
+  }
+  down(){
+    this.setState({board: this.state.board.move(3)});
+  }
+  left(){
+    this.setState({board: this.state.board.move(0)});
+  }
+  right(){
+    this.setState({board: this.state.board.move(2)});
+  }
+  
   restartGame() {
     this.setState({board: new Board});
   }
@@ -13,8 +32,7 @@ class BoardView extends React.Component {
     if (event.keyCode >= 37 && event.keyCode <= 40) {
       event.preventDefault();
       var direction = event.keyCode - 37;
-      console.log(event.keyCode);
-      this.setState({board: this.state.board.move(direction)});
+      //this.setState({board: this.state.board.move(direction)});
     }
   }
   handleTouchStart(event) {
@@ -65,7 +83,7 @@ class BoardView extends React.Component {
       .filter(tile => tile.value != 0)
       .map(tile => <TileView tile={tile} key={tile.id} />);
     return (
-      <div className='board' onTouchStart={this.handleTouchStart.bind(this)} onTouchEnd={this.handleTouchEnd.bind(this)} tabIndex="1">
+      <div className={"board " + (this.props.visible == true ? "visible" : "hidden")} onTouchStart={this.handleTouchStart.bind(this)} onTouchEnd={this.handleTouchEnd.bind(this)} tabIndex="1">
         {cells}
         {tiles}
         <GameEndOverlay board={this.state.board} onRestart={this.restartGame.bind(this)} />
@@ -131,7 +149,7 @@ var GameEndOverlay = ({board, onRestart}) => {
     return null;
   }
   return (
-    <div className='overlay'>
+    <div className={"overlay"}>
       <p className='message'>{contents}</p>
       <button className="tryAgain" onClick={onRestart} onTouchEnd={onRestart}>Try again</button>
     </div>

@@ -16,6 +16,7 @@ class TouchPlayerWrapper extends React.Component{
             videoFileList_files: window.files
             ,videoFullScreenMainMenuGui_visible: false
             ,videoFullScreenWithMapGui_visible: false
+            ,game2048_visible: false
         }
 
         var state = new VideoFullScreenState(this);
@@ -50,7 +51,7 @@ class TouchPlayerWrapper extends React.Component{
             this.videoPlayer = null;
             this.videoFileList = null;
             this.videoFullScreenWithMap = null;
-
+            this.game2048 = null;
         })
 
         this.playFile = this.playFile.bind(this);
@@ -66,7 +67,7 @@ class TouchPlayerWrapper extends React.Component{
                 <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} ref={(e) => this.videoFileList=e} playVideo={this.playFile}/>
                 <VideoFullScreenMainMenuGui visible={this.state.videoFullScreenMainMenuGui_visible}/>
                 <VideoFullScreenWithMapGui visible={this.state.videoFullScreenWithMapGui_visible} ref={(e)=> this.videoFullScreenWithMap=e}/>
-                <BoardView />
+                <BoardView visible={this.state.game2048_visible} ref={(e)=> this.game2048=e}/>
             </div>;
     }
 }
