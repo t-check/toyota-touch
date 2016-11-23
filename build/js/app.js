@@ -20660,11 +20660,6 @@
 })(function (React) {
   return React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
 });
-window.onload = function () {
-    const element = React.createElement(TouchPlayerWrapper, null);
-
-    ReactDOM.render(element, document.getElementById('body'));
-};
 class TouchPlayerWrapper extends React.Component {
     constructor(props) {
         super(props);
@@ -20911,6 +20906,11 @@ class VideoPlayer extends React.Component {
         );
     }
 }
+window.onload = function () {
+    const element = React.createElement(TouchPlayerWrapper, null);
+
+    ReactDOM.render(element, document.getElementById('body'));
+};
 var rotateLeft = function (matrix) {
   var rows = matrix.length;
   var columns = matrix[0].length;
