@@ -24,7 +24,7 @@ app.get('/css', function(req, res){
 
 app.get('/files', function(req, res){
     var fileList = [];
-    fs.readdir('/Users/tomislavhorvaticek/Downloads', function(err, files){
+    fs.readdir('/media/pi/9CC8BB5BC8BB327E/USA', function(err, files){
         for(var i=0; i<files.length; i++){
             if (files[i].indexOf('.mp4') >= 0){
                 fileList.push({name: files[i]});
@@ -39,7 +39,7 @@ app.get('/files', function(req, res){
     })
 })
 
-app.use('/media-file', express.static('/Users/tomislavhorvaticek/Downloads'));
+app.use('/media-file', express.static('/media/pi/9CC8BB5BC8BB327E/USA'));
 
 app.listen(3333, function () {
   console.log('Example app listening on port 3333!')
