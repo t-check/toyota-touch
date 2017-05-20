@@ -9,8 +9,21 @@ class VideoPlayer extends React.Component{
         this.right = this.right.bind(this);
         this.ok = this.ok.bind(this);
         this.playFile = this.playFile.bind(this);
+        this.files = props.files;
+        this.selectedIndex = props.selectedIndex;
+        this.setSelectedIndex = props.setSelectedIndex;
 
         this.state = {selectedIndex: 0};
+
+        
+    }
+
+    componentDidMount(){
+        var self = this;
+        this.videoElement.onended = function(e){
+            self.setSelectedIndex(self.selectedIndex+1);
+            self.playFile(self.files[self.selectedIndex+1]);
+        };
     }
 
     up(){

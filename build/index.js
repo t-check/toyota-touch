@@ -24,6 +24,8 @@ app.get('/css', function(req, res){
 
 app.get('/files', function(req, res){
     var fileList = [];
+    // /media/pi/9CC8BB5BC8BB327E/USA
+    // /Users/tomislavhorvaticek/Downloads
     fs.readdir('/media/pi/9CC8BB5BC8BB327E/USA', function(err, files){
         for(var i=0; i<files.length; i++){
             if (files[i].indexOf('.mp4') >= 0){

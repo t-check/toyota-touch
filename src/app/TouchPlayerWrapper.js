@@ -56,6 +56,11 @@ class TouchPlayerWrapper extends React.Component{
         })
 
         this.playFile = this.playFile.bind(this);
+        this.setSelectedIndex = this.setSelectedIndex.bind(this);
+    }
+
+    setSelectedIndex(index){
+        this.setState({videoFileList_selectedIndex: index})
     }
 
     playFile(file){
@@ -64,8 +69,8 @@ class TouchPlayerWrapper extends React.Component{
 
     render(){
         return <div className="touch-player-wrapper">
-                <VideoPlayer ref={(e) => this.videoPlayer = e} />
-                <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} ref={(e) => this.videoFileList=e} playVideo={this.playFile}/>
+                <VideoPlayer ref={(e) => this.videoPlayer = e} files={this.state.videoFileList_files} selectedIndex={this.state.videoFileList_selectedIndex} setSelectedIndex={this.setSelectedIndex}/>
+                <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} ref={(e) => this.videoFileList=e} playVideo={this.playFile} selectedIndex={this.state.videoFileList_selectedIndex} setSelectedIndex={this.setSelectedIndex}/>
                 <VideoFullScreenMainMenuGui visible={this.state.videoFullScreenMainMenuGui_visible}/>
                 <VideoFullScreenWithMapGui visible={this.state.videoFullScreenWithMapGui_visible} ref={(e)=> this.videoFullScreenWithMap=e}/>
                 <BoardView visible={this.state.game2048_visible} ref={(e)=> this.game2048=e}/>

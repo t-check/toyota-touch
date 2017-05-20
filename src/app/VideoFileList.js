@@ -10,7 +10,9 @@ class VideoFileList extends React.Component{
         this.ok = this.ok.bind(this);
         this.maxVisibleElements = 5;
         this.topVisibleElements = Math.floor(this.maxVisibleElements/2);
- 
+        this.files = props.files;
+        this.selectedIndex = props.selectedIndex;
+        
         this.state = {selectedIndex: 0};
     }
 
@@ -28,8 +30,11 @@ class VideoFileList extends React.Component{
     }
 
     ok(){
-        this.props.playVideo(this.props.files[this.state.selectedIndex]);
+        this.props.playVideo(this.files[this.state.selectedIndex]);
+        this.props.setSelectedIndex(this.state.selectedIndex);
     }
+
+
 
     render(){
         let liElements = [];

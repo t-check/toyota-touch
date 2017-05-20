@@ -926,7 +926,7 @@ body,
   bottom: 0px;
   width: 100%;
   height: 100%;
-  opacity: 0.8;
+  opacity: 1;
 }
 .video-full-screen-with-map .google-maps-map {
   width: 100%;

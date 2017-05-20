@@ -20713,6 +20713,11 @@ class TouchPlayerWrapper extends React.Component {
         });
 
         this.playFile = this.playFile.bind(this);
+        this.setSelectedIndex = this.setSelectedIndex.bind(this);
+    }
+
+    setSelectedIndex(index) {
+        this.setState({ videoFileList_selectedIndex: index });
     }
 
     playFile(file) {
@@ -20723,8 +20728,8 @@ class TouchPlayerWrapper extends React.Component {
         return React.createElement(
             'div',
             { className: 'touch-player-wrapper' },
-            React.createElement(VideoPlayer, { ref: e => this.videoPlayer = e }),
-            React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, ref: e => this.videoFileList = e, playVideo: this.playFile }),
+            React.createElement(VideoPlayer, { ref: e => this.videoPlayer = e, files: this.state.videoFileList_files, selectedIndex: this.state.videoFileList_selectedIndex, setSelectedIndex: this.setSelectedIndex }),
+            React.createElement(VideoFileList, { visible: this.state.videoFileList_visible, files: this.state.videoFileList_files, ref: e => this.videoFileList = e, playVideo: this.playFile, selectedIndex: this.state.videoFileList_selectedIndex, setSelectedIndex: this.setSelectedIndex }),
             React.createElement(VideoFullScreenMainMenuGui, { visible: this.state.videoFullScreenMainMenuGui_visible }),
             React.createElement(VideoFullScreenWithMapGui, { visible: this.state.videoFullScreenWithMapGui_visible, ref: e => this.videoFullScreenWithMap = e }),
             React.createElement(BoardView, { visible: this.state.game2048_visible, ref: e => this.game2048 = e })
@@ -20743,6 +20748,8 @@ class VideoFileList extends React.Component {
         this.ok = this.ok.bind(this);
         this.maxVisibleElements = 5;
         this.topVisibleElements = Math.floor(this.maxVisibleElements / 2);
+        this.files = props.files;
+        this.selectedIndex = props.selectedIndex;
 
         this.state = { selectedIndex: 0 };
     }
@@ -20759,7 +20766,8 @@ class VideoFileList extends React.Component {
     right() {}
 
     ok() {
-        this.props.playVideo(this.props.files[this.state.selectedIndex]);
+        this.props.playVideo(this.files[this.state.selectedIndex]);
+        this.props.setSelectedIndex(this.state.selectedIndex);
     }
 
     render() {
@@ -20882,8 +20890,19 @@ class VideoPlayer extends React.Component {
         this.right = this.right.bind(this);
         this.ok = this.ok.bind(this);
         this.playFile = this.playFile.bind(this);
+        this.files = props.files;
+        this.selectedIndex = props.selectedIndex;
+        this.setSelectedIndex = props.setSelectedIndex;
 
         this.state = { selectedIndex: 0 };
+    }
+
+    componentDidMount() {
+        var self = this;
+        this.videoElement.onended = function (e) {
+            self.setSelectedIndex(self.selectedIndex + 1);
+            self.playFile(self.files[self.selectedIndex + 1]);
+        };
     }
 
     up() {}
@@ -20912,214 +20931,6 @@ window.onload = function () {
 
     ReactDOM.render(element, document.getElementById('body'));
 };
-class Game2048Screen {
-    constructor(touchPlayerWrapperContext) {
-        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
-
-        this.left = this.left.bind(this);
-        this.right = this.right.bind(this);
-        this.up = this.up.bind(this);
-        this.down = this.down.bind(this);
-        this.ok = this.ok.bind(this);
-        this.back = this.back.bind(this);
-
-        this.touchPlayerWrapperContext.setState({
-            game2048_visible: true
-        });
-    }
-
-    left() {
-        this.touchPlayerWrapperContext.game2048.left();
-        return this;
-    }
-    right() {
-        this.touchPlayerWrapperContext.game2048.right();
-        return this;
-    }
-    up() {
-        this.touchPlayerWrapperContext.game2048.up();
-        return this;
-    }
-    down() {
-        this.touchPlayerWrapperContext.game2048.down();
-        return this;
-    }
-    ok() {
-        this.touchPlayerWrapperContext.game2048.ok();
-        return this;
-    }
-    back() {
-        this.touchPlayerWrapperContext.setState({
-            game2048_visible: false
-        });
-        return new VideoFullScreenState(this.touchPlayerWrapperContext);
-    }
-}
-class VideoFullScreenWithPlaylist {
-    constructor(touchPlayerWrapperContext) {
-        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
-
-        this.left = this.left.bind(this);
-        this.right = this.right.bind(this);
-        this.up = this.up.bind(this);
-        this.down = this.down.bind(this);
-        this.ok = this.ok.bind(this);
-        this.back = this.back.bind(this);
-
-        this.touchPlayerWrapperContext.setState({
-            videoFileList_visible: true
-        });
-    }
-
-    left() {
-        this.touchPlayerWrapperContext.videoFileList.left();
-        return this;
-    }
-    right() {
-        this.touchPlayerWrapperContext.videoFileList.right();
-        return this;
-    }
-    up() {
-        this.touchPlayerWrapperContext.videoFileList.up();
-        return this;
-    }
-    down() {
-        this.touchPlayerWrapperContext.videoFileList.down();
-        return this;
-    }
-    ok() {
-        this.touchPlayerWrapperContext.videoFileList.ok();
-        return this;
-    }
-    back() {
-        this.touchPlayerWrapperContext.setState({
-            videoFileList_visible: false
-        });
-        return new VideoFullScreenState(this.touchPlayerWrapperContext);
-    }
-}
-class VideoFullScreenStateMainMenu {
-    constructor(touchPlayerWrapperContext) {
-        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
-
-        this.left = this.left.bind(this);
-        this.right = this.right.bind(this);
-        this.up = this.up.bind(this);
-        this.down = this.down.bind(this);
-        this.ok = this.ok.bind(this);
-        this.back = this.back.bind(this);
-
-        this.touchPlayerWrapperContext.setState({
-            videoFullScreenMainMenuGui_visible: true
-        });
-    }
-
-    left() {
-        this.touchPlayerWrapperContext.setState({
-            videoFullScreenMainMenuGui_visible: false
-        });
-        return new Game2048Screen(this.touchPlayerWrapperContext);
-    }
-    right() {
-        return this;
-    }
-    up() {
-        return this;
-    }
-    down() {
-        return this;
-    }
-    ok() {
-        this.touchPlayerWrapperContext.setState({
-            videoFullScreenMainMenuGui_visible: false
-        });
-        return new VideoFullScreenWithMap(this.touchPlayerWrapperContext);
-        //return this;
-    }
-    back() {
-        this.touchPlayerWrapperContext.setState({
-            videoFullScreenMainMenuGui_visible: false
-        });
-        return new VideoFullScreenState(this.touchPlayerWrapperContext);
-    }
-}
-class VideoFullScreenState {
-    constructor(touchPlayerWrapperContext) {
-        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
-
-        this.left = this.left.bind(this);
-        this.right = this.right.bind(this);
-        this.up = this.up.bind(this);
-        this.down = this.down.bind(this);
-        this.ok = this.ok.bind(this);
-        this.back = this.back.bind(this);
-    }
-
-    left() {
-        return this;
-    }
-    right() {
-        return this;
-    }
-    up() {
-        return this;
-    }
-    down() {
-        return this;
-    }
-    ok() {
-        //this.touchPlayerWrapperContext.videoPlayer.play('file:///Users/tomislavhorvaticek/Downloads/Aventura%20-%20Obsesion.mp4');
-        return new VideoFullScreenWithPlaylist(this.touchPlayerWrapperContext);
-    }
-    back() {
-        return new VideoFullScreenStateMainMenu(this.touchPlayerWrapperContext);
-    }
-}
-class VideoFullScreenWithMap {
-    constructor(touchPlayerWrapperContext) {
-        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
-
-        this.left = this.left.bind(this);
-        this.right = this.right.bind(this);
-        this.up = this.up.bind(this);
-        this.down = this.down.bind(this);
-        this.ok = this.ok.bind(this);
-        this.back = this.back.bind(this);
-
-        this.touchPlayerWrapperContext.setState({
-            videoFullScreenWithMapGui_visible: true
-        });
-
-        this.touchPlayerWrapperContext.videoFullScreenWithMap.activate();
-    }
-
-    left() {
-        this.touchPlayerWrapperContext.videoFullScreenWithMap.left();
-        return this;
-    }
-    right() {
-        this.touchPlayerWrapperContext.videoFullScreenWithMap.right();
-        return this;
-    }
-    up() {
-        this.touchPlayerWrapperContext.videoFullScreenWithMap.up();
-        return this;
-    }
-    down() {
-        this.touchPlayerWrapperContext.videoFullScreenWithMap.down();
-        return this;
-    }
-    ok() {
-        this.touchPlayerWrapperContext.videoFullScreenWithMap.ok();
-        return this;
-    }
-    back() {
-        this.touchPlayerWrapperContext.setState({
-            videoFullScreenWithMapGui_visible: false
-        });
-        return new VideoFullScreenState(this.touchPlayerWrapperContext);
-    }
-}
 var rotateLeft = function (matrix) {
   var rows = matrix.length;
   var columns = matrix[0].length;
@@ -21467,3 +21278,211 @@ var GameEndOverlay = ({ board, onRestart }) => {
 };
 
 //ReactDOM.render(<BoardView />, document.getElementById('boardDiv'));
+class Game2048Screen {
+    constructor(touchPlayerWrapperContext) {
+        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
+
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.ok = this.ok.bind(this);
+        this.back = this.back.bind(this);
+
+        this.touchPlayerWrapperContext.setState({
+            game2048_visible: true
+        });
+    }
+
+    left() {
+        this.touchPlayerWrapperContext.game2048.left();
+        return this;
+    }
+    right() {
+        this.touchPlayerWrapperContext.game2048.right();
+        return this;
+    }
+    up() {
+        this.touchPlayerWrapperContext.game2048.up();
+        return this;
+    }
+    down() {
+        this.touchPlayerWrapperContext.game2048.down();
+        return this;
+    }
+    ok() {
+        this.touchPlayerWrapperContext.game2048.ok();
+        return this;
+    }
+    back() {
+        this.touchPlayerWrapperContext.setState({
+            game2048_visible: false
+        });
+        return new VideoFullScreenState(this.touchPlayerWrapperContext);
+    }
+}
+class VideoFullScreenWithPlaylist {
+    constructor(touchPlayerWrapperContext) {
+        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
+
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.ok = this.ok.bind(this);
+        this.back = this.back.bind(this);
+
+        this.touchPlayerWrapperContext.setState({
+            videoFileList_visible: true
+        });
+    }
+
+    left() {
+        this.touchPlayerWrapperContext.videoFileList.left();
+        return this;
+    }
+    right() {
+        this.touchPlayerWrapperContext.videoFileList.right();
+        return this;
+    }
+    up() {
+        this.touchPlayerWrapperContext.videoFileList.up();
+        return this;
+    }
+    down() {
+        this.touchPlayerWrapperContext.videoFileList.down();
+        return this;
+    }
+    ok() {
+        this.touchPlayerWrapperContext.videoFileList.ok();
+        return this;
+    }
+    back() {
+        this.touchPlayerWrapperContext.setState({
+            videoFileList_visible: false
+        });
+        return new VideoFullScreenState(this.touchPlayerWrapperContext);
+    }
+}
+class VideoFullScreenStateMainMenu {
+    constructor(touchPlayerWrapperContext) {
+        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
+
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.ok = this.ok.bind(this);
+        this.back = this.back.bind(this);
+
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: true
+        });
+    }
+
+    left() {
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: false
+        });
+        return new Game2048Screen(this.touchPlayerWrapperContext);
+    }
+    right() {
+        return this;
+    }
+    up() {
+        return this;
+    }
+    down() {
+        return this;
+    }
+    ok() {
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: false
+        });
+        return new VideoFullScreenWithMap(this.touchPlayerWrapperContext);
+        //return this;
+    }
+    back() {
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenMainMenuGui_visible: false
+        });
+        return new VideoFullScreenState(this.touchPlayerWrapperContext);
+    }
+}
+class VideoFullScreenState {
+    constructor(touchPlayerWrapperContext) {
+        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
+
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.ok = this.ok.bind(this);
+        this.back = this.back.bind(this);
+    }
+
+    left() {
+        return this;
+    }
+    right() {
+        return this;
+    }
+    up() {
+        return this;
+    }
+    down() {
+        return this;
+    }
+    ok() {
+        //this.touchPlayerWrapperContext.videoPlayer.play('file:///Users/tomislavhorvaticek/Downloads/Aventura%20-%20Obsesion.mp4');
+        return new VideoFullScreenWithPlaylist(this.touchPlayerWrapperContext);
+    }
+    back() {
+        return new VideoFullScreenStateMainMenu(this.touchPlayerWrapperContext);
+    }
+}
+class VideoFullScreenWithMap {
+    constructor(touchPlayerWrapperContext) {
+        this.touchPlayerWrapperContext = touchPlayerWrapperContext;
+
+        this.left = this.left.bind(this);
+        this.right = this.right.bind(this);
+        this.up = this.up.bind(this);
+        this.down = this.down.bind(this);
+        this.ok = this.ok.bind(this);
+        this.back = this.back.bind(this);
+
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenWithMapGui_visible: true
+        });
+
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.activate();
+    }
+
+    left() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.left();
+        return this;
+    }
+    right() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.right();
+        return this;
+    }
+    up() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.up();
+        return this;
+    }
+    down() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.down();
+        return this;
+    }
+    ok() {
+        this.touchPlayerWrapperContext.videoFullScreenWithMap.ok();
+        return this;
+    }
+    back() {
+        this.touchPlayerWrapperContext.setState({
+            videoFullScreenWithMapGui_visible: false
+        });
+        return new VideoFullScreenState(this.touchPlayerWrapperContext);
+    }
+}
