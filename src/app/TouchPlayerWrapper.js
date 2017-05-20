@@ -7,6 +7,7 @@ class TouchPlayerWrapper extends React.Component{
         }
 
         this.state = {
+            visibleState: 'videoplayer',
             video:{
                 visible: true
             },

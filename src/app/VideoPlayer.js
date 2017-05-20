@@ -29,7 +29,7 @@ class VideoPlayer extends React.Component{
     }
 
     playFile(file){
-        this.videoElement.src = file.name;
+        this.videoElement.src = '/media-file/' + file.name;
     }
 
 
