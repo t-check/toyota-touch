@@ -22,6 +22,10 @@ app.get('/css', function(req, res){
     fileStream.pipe(res);
 });
 
+app.get('/folders', function(req, res){
+    
+})
+
 app.get('/files', function(req, res){
     var fileList = [];
     // /media/pi/9CC8BB5BC8BB327E/USA

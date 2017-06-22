@@ -918,8 +918,10 @@ toyota-video-file-list ul li,
 toyota-map-viewer ul li,
 toyota-map-viewer > div ul li,
 .fs-toyota ul li {
-  margin-left: 10%;
-  margin-right: 10%;
+  height: 66px;
+  overflow: hidden;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 toyota-video-file-list ul li.selected,
 .video-file-list ul li.selected,
