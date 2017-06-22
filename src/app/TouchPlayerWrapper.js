@@ -56,6 +56,8 @@ class TouchPlayerWrapper extends React.Component{
         })
 
         this.playFile = this.playFile.bind(this);
+        this.playNext = this.playNext.bind(this);
+        this.playPrevious = this.playPrevious.bind(this);
         this.setSelectedIndex = this.setSelectedIndex.bind(this);
     }
 
@@ -63,13 +65,24 @@ class TouchPlayerWrapper extends React.Component{
         this.setState({videoFileList_selectedIndex: index})
     }
 
-    playFile(file){
-        this.videoPlayer.playFile(file);
+    playFile(index){
+        this.videoPlayer.playFile(window.files[index])
+        this.setState({videoFileList_selectedIndex: index});
+    }
+
+    playNext(){
+        this.videoPlayer.playFile(window.files[(this.state.videoFileList_selectedIndex+1)% window.files.length])
+        this.setState({videoFileList_selectedIndex: (this.state.videoFileList_selectedIndex+1)% window.files.length});
+    }
+
+    playPrevious(){
+        this.videoPlayer.playFile(window.files[(this.state.videoFileList_selectedIndex-1)% window.files.length])
+        this.setState({videoFileList_selectedIndex: (this.state.videoFileList_selectedIndex-1)% window.files.length});
     }
 
     render(){
         return <div className="touch-player-wrapper">
-                <VideoPlayer ref={(e) => this.videoPlayer = e} files={this.state.videoFileList_files} selectedIndex={this.state.videoFileList_selectedIndex} setSelectedIndex={this.setSelectedIndex}/>
+                <VideoPlayer ref={(e) => this.videoPlayer = e} files={this.state.videoFileList_files} playNext={this.playNext} playPrevious={this.playPrevious}/>
                 <VideoFileList visible={this.state.videoFileList_visible} files={this.state.videoFileList_files} ref={(e) => this.videoFileList=e} playVideo={this.playFile} selectedIndex={this.state.videoFileList_selectedIndex} setSelectedIndex={this.setSelectedIndex}/>
                 <VideoFullScreenMainMenuGui visible={this.state.videoFullScreenMainMenuGui_visible}/>
                 <VideoFullScreenWithMapGui visible={this.state.videoFullScreenWithMapGui_visible} ref={(e)=> this.videoFullScreenWithMap=e}/>

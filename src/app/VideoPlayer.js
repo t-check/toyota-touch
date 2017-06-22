@@ -10,9 +10,8 @@ class VideoPlayer extends React.Component{
         this.ok = this.ok.bind(this);
         this.playFile = this.playFile.bind(this);
         this.files = props.files;
-        this.selectedIndex = props.selectedIndex;
-        this.setSelectedIndex = props.setSelectedIndex;
-
+        this.playNext = props.playNext.bind(this);;
+        this.playPrevious = props.playPrevious.bind(this);
         this.state = {selectedIndex: 0};
 
         
@@ -21,14 +20,16 @@ class VideoPlayer extends React.Component{
     componentDidMount(){
         var self = this;
         this.videoElement.onended = function(e){
-            self.setSelectedIndex(self.selectedIndex+1);
-            self.playFile(self.files[self.selectedIndex+1]);
+            self.playNext();
         };
     }
 
     up(){
+        debugger;
+        this.playNext();
     }
     down(){
+        this.playPrevious();
     }
 
     left(){

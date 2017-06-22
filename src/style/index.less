@@ -802,11 +802,19 @@ body {
 
 
 
-html, head, body, #body{
+html, head, body, #body, toyota-app, toyota-video-file-list, toyota-video-player, video, toyota-map-viewer{
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
+}
+
+toyota-app, toyota-video-file-list, toyota-video-player, video{
+  display: block;
+}
+
+video{
+  background-color: black;
 }
 
 .hidden{
@@ -823,13 +831,13 @@ html, head, body, #body{
     }
 }
 
-.video-file-list{
+toyota-video-file-list,.video-file-list, toyota-map-viewer, toyota-map-viewer > div, .fs-toyota{
     position: fixed;
     top: 0px;
     bottom: 0px;
     width: 100%;
     height: 100%;
-    opacity: 0.8;
+    opacity: 1;
     background-color: black;
     color: white;
     text-align: center;

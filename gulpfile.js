@@ -22,11 +22,7 @@ gulp.task('server-side-concat', function(){
 })
 
 gulp.task('concat', ['copy-html'], function(){
-    return gulp.src(['bower_components/react/react.js', 'bower_components/react/react-dom.js', 'bower_components/lodash/dist/loadash.min.js', 'src/app/**/*.js'])
-        .pipe(babel({
-            "plugins": ["transform-react-jsx"]
-            ,compact: false
-        }))
+    return gulp.src(['node_modules/angular/angular.js', 'src/app/angular/app.js', 'src/app/angular/**/*.js'])
         .pipe(concat('app.js'))
         .pipe(gulp.dest('build/js'))
 })

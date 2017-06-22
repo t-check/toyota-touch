@@ -853,11 +853,25 @@ body {
 html,
 head,
 body,
-#body {
+#body,
+toyota-app,
+toyota-video-file-list,
+toyota-video-player,
+video,
+toyota-map-viewer {
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
+}
+toyota-app,
+toyota-video-file-list,
+toyota-video-player,
+video {
+  display: block;
+}
+video {
+  background-color: black;
 }
 .hidden {
   display: none;
@@ -870,19 +884,27 @@ body,
   width: 100%;
   height: 100%;
 }
-.video-file-list {
+toyota-video-file-list,
+.video-file-list,
+toyota-map-viewer,
+toyota-map-viewer > div,
+.fs-toyota {
   position: fixed;
   top: 0px;
   bottom: 0px;
   width: 100%;
   height: 100%;
-  opacity: 0.8;
+  opacity: 1;
   background-color: black;
   color: white;
   text-align: center;
   font-size: 60px;
 }
-.video-file-list ul {
+toyota-video-file-list ul,
+.video-file-list ul,
+toyota-map-viewer ul,
+toyota-map-viewer > div ul,
+.fs-toyota ul {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -891,11 +913,19 @@ body,
   -webkit-padding-start: 0;
   list-style-type: none;
 }
-.video-file-list ul li {
+toyota-video-file-list ul li,
+.video-file-list ul li,
+toyota-map-viewer ul li,
+toyota-map-viewer > div ul li,
+.fs-toyota ul li {
   margin-left: 10%;
   margin-right: 10%;
 }
-.video-file-list ul li.selected {
+toyota-video-file-list ul li.selected,
+.video-file-list ul li.selected,
+toyota-map-viewer ul li.selected,
+toyota-map-viewer > div ul li.selected,
+.fs-toyota ul li.selected {
   background-color: blue;
 }
 .video-full-screen-main-menu-gui {
