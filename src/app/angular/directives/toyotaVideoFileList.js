@@ -38,7 +38,8 @@ app.directive('toyotaVideoFileList', ['$rootScope', 'VideoPlayer', 'FileList', '
                                     return array;
                                 }
 
-                                shuffleArray($rootScope.files);
+                                $rootScope.files = shuffleArray($rootScope.files);
+                                $rootScope.$apply();
                             }
                         });
                     }
