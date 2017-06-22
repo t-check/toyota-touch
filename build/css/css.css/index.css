@@ -892,7 +892,7 @@ toyota-map-viewer > div,
   position: fixed;
   top: 0px;
   bottom: 0px;
-  width: 1000px;
+  width: 100%;
   height: 100%;
   opacity: 1;
   background-color: black;
@@ -918,7 +918,9 @@ toyota-video-file-list ul li,
 toyota-map-viewer ul li,
 toyota-map-viewer > div ul li,
 .fs-toyota ul li {
-  height: 66px;
+  height: 75px;
+  width: 1000px;
+  font-size: 40px;
   overflow: hidden;
   margin-left: 5px;
   margin-right: 5px;
