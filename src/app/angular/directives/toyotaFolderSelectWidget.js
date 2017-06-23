@@ -1,25 +1,33 @@
-app.directive('toyotaVideoFileList', ['$rootScope', 'VideoPlayer', 'FileList', 'StateManager',  function($rootScope, VideoPlayer, FileList, StateManager){
+app.directive('toyotaFolderSelectWidget', ['$rootScope', 'FileList', 'StateManager',  function($rootScope, FileList, StateManager){
         return{
             link: function(scope, element, attrs){
                 scope.selectedIndex  = 0;
+                scope.folders = [];
+                FileList.getFolders().then(function(d){
+                    scope.folders = d;
+                })
+
                 $rootScope.$watch(attrs.ngShow, function(showAttr){
                     if (showAttr){
-                        scope.selectedIndex = VideoPlayer.getCurrentIndex();
                         StateManager.takeOver({
-                            name: 'fileList',
+                            name: 'folder-select',
                             ok: function(){
-                                $rootScope.playVideo(scope.selectedIndex);
+                                //$rootScope.playVideo(scope.selectedIndex);
                                 StateManager.back();
+                                FileList.selectFolder(scope.folders[scope.selectedIndex].name);
+                                FileList.init().then(function(f){
+                                    $rootScope.files = f;
+                                })
                             },
                             up: function(){
                                 scope.selectedIndex--;
                                 if (scope.selectedIndex < 0){
-                                    scope.selectedIndex = $rootScope.files.length -1;
+                                    scope.selectedIndex = scope.folders.length -1;
                                 }
                             },
                             down: function(){
                                 scope.selectedIndex++;
-                                if (scope.selectedIndex == $rootScope.files.length){
+                                if (scope.selectedIndex >= scope.folders.length){
                                     scope.selectedIndex = 0;
                                 }
                             },
@@ -46,7 +54,7 @@ app.directive('toyotaVideoFileList', ['$rootScope', 'VideoPlayer', 'FileList', '
             },
             scope: {
             },
-            template: '<select-list selected-index="selectedIndex" all-items="$parent.files"></select-list>'
+            template: '<select-list selected-index="selectedIndex" all-items="folders"></select-list>'
             //template: '<ul><li ng-repeat="file in visibleFiles track by $index" ng-class="{\'selected\': $index== 2}">{{file.name}}</li></ul>'
         }
     }])

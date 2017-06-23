@@ -33394,7 +33394,16 @@ app.run(['$rootScope', 'FileList', 'VideoPlayer', 'StateManager', function( $roo
     }
 
     FileList.init().then(function(files){
-        $rootScope.files = files;
+        var shuffleArray = function (array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+            return array;
+        }
+        $rootScope.files = shuffleArray(files);
         $rootScope.selectedFileIndex = 0;
         $rootScope.playVideo = function(index){
             $rootScope.selectedFileIndex = index;
@@ -33477,7 +33486,7 @@ app.directive('selectList', ['$rootScope',  function($rootScope){
                     calculateVisibleItems();
                 })
 
-                scope.$watch('allItems', function(allItems){
+                scope.$watchCollection('allItems', function(allItems){
                     scope.allItems = allItems;
                     calculateVisibleItems();
                 })
@@ -33519,7 +33528,69 @@ app.directive('toyotaApp', ['$rootScope', 'StateManager', 'VideoPlayer', functio
             template: '<toyota-video-player></toyota-video-player>\
                 <toyota-video-file-list ng-show="visibleWidget==\'fileList\'"></toyota-video-file-list>\
                 <toyota-map-viewer ng-show="visibleWidget==\'map\'"></toyota-map-viewer>\
-                <toyota-select-widget ng-show="visibleWidget==\'selectWidget\'" class="fs-toyota"></toyota-select-widget>'
+                <toyota-select-widget ng-show="visibleWidget==\'selectWidget\'" class="fs-toyota"></toyota-select-widget>\
+                <toyota-folder-select-widget ng-show="visibleWidget==\'folder-select\'" class="fs-toyota"></toyota-folder-select-widget>\
+                <div>{{visibleWidget}}</div>'
+        }
+    }])
+app.directive('toyotaFolderSelectWidget', ['$rootScope', 'FileList', 'StateManager',  function($rootScope, FileList, StateManager){
+        return{
+            link: function(scope, element, attrs){
+                scope.selectedIndex  = 0;
+                scope.folders = [];
+                FileList.getFolders().then(function(d){
+                    scope.folders = d;
+                })
+
+                $rootScope.$watch(attrs.ngShow, function(showAttr){
+                    if (showAttr){
+                        StateManager.takeOver({
+                            name: 'folder-select',
+                            ok: function(){
+                                //$rootScope.playVideo(scope.selectedIndex);
+                                StateManager.back();
+                                FileList.selectFolder(scope.folders[scope.selectedIndex].name);
+                                FileList.init().then(function(f){
+                                    $rootScope.files = f;
+                                })
+                            },
+                            up: function(){
+                                scope.selectedIndex--;
+                                if (scope.selectedIndex < 0){
+                                    scope.selectedIndex = scope.folders.length -1;
+                                }
+                            },
+                            down: function(){
+                                scope.selectedIndex++;
+                                if (scope.selectedIndex >= scope.folders.length){
+                                    scope.selectedIndex = 0;
+                                }
+                            },
+                            left: function(){
+                                StateManager.back();
+                                $rootScope.visibleWidget = 'selectWidget';
+                            },
+                            right: function(){
+                                var shuffleArray = function (array) {
+                                    for (var i = array.length - 1; i > 0; i--) {
+                                        var j = Math.floor(Math.random() * (i + 1));
+                                        var temp = array[i];
+                                        array[i] = array[j];
+                                        array[j] = temp;
+                                    }
+                                    return array;
+                                }
+
+                                $rootScope.files = shuffleArray($rootScope.files);
+                            }
+                        });
+                    }
+                 })
+            },
+            scope: {
+            },
+            template: '<select-list selected-index="selectedIndex" all-items="folders"></select-list>'
+            //template: '<ul><li ng-repeat="file in visibleFiles track by $index" ng-class="{\'selected\': $index== 2}">{{file.name}}</li></ul>'
         }
     }])
 app.directive('toyotaMapViewer', ['$rootScope', 'VideoPlayer', 'FileList', 'StateManager',  function($rootScope, VideoPlayer, FileList, StateManager){
@@ -33531,7 +33602,8 @@ app.directive('toyotaMapViewer', ['$rootScope', 'VideoPlayer', 'FileList', 'Stat
 
         return{
             link: function(scope, element, attrs){
-                scope.$watch(attrs.ngShow, function(showAttr){
+                scope.zoomMapVisible = false;
+                $rootScope.$watch(attrs.ngShow, function(showAttr){
                     if (showAttr && !mapLoaded){
                         map = new google.maps.Map(document.getElementById('google-map'), {
                             center: {lat: lat, lng: lon},
@@ -33549,19 +33621,27 @@ app.directive('toyotaMapViewer', ['$rootScope', 'VideoPlayer', 'FileList', 'Stat
                         StateManager.takeOver({
                             name: 'map',
                             ok: function(){
-                                StateManager.back();
-                                if (scope.widgets[scope.selectedIndex].name == 'Maps'){
-                                    $rootScope.visibleWidget = 'map';
-                                }
+                                scope.zoomMapVisible = !scope.zoomMapVisible;
                             },
                             up: function(){
                                 //lat = lat + 150.55 / (591657550.500000 / Math.pow(2, zoom-1));
-                                
-                                map.panBy(0, -200);
+                                if (!scope.zoomMapVisible){
+                                    map.panBy(0, -200);
+                                }
+                                else{
+                                    zoom++;
+                                    map.setZoom(zoom);
+                                }
 
                             },
                             down: function(){
-                                map.panBy(0, 200);
+                                if (!scope.zoomMapVisible){
+                                    map.panBy(0, 200);
+                                }
+                                else{
+                                    zoom--;
+                                    map.setZoom(zoom);
+                                }
                             },
                             left: function(){
                                 map.panBy(-200, 0);
@@ -33576,20 +33656,21 @@ app.directive('toyotaMapViewer', ['$rootScope', 'VideoPlayer', 'FileList', 'Stat
 
                 
             },
-            template: '<div id="google-map"></div>'
+            scope:{},
+            template: '<div ng-show="zoomMapVisible" style="z-index: 999;background-color: rgba(0,0,0,0.4);">UP: Zoom in<br/>DOWN: Zoom out<br/>OK: return</div><div id="google-map"></div>'
         }
     }])
-app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'StateManager',  function($rootScope, VideoPlayer, FileList, StateManager){
+app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'StateManager', 'UpdatePlayer',  function($rootScope, VideoPlayer, FileList, StateManager, UpdatePlayer){
         return{
             link: function(scope, element, attrs){
                 scope.widgets = [
                     {name: 'Maps'},
                     {name: 'Folder select'},
-                    {name: 'None'},
-                    {name: 'None'}
+                    {name: 'Update player'},
+                    {name: 'Reboot player'}
                 ]
                 scope.selectedIndex  = 0;
-                scope.$watch(attrs.ngShow, function(showAttr){
+                $rootScope.$watch(attrs.ngShow, function(showAttr){
                     if (showAttr){
                         scope.selectedIndex = VideoPlayer.getCurrentIndex();
                         StateManager.takeOver({
@@ -33598,6 +33679,12 @@ app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'S
                                 StateManager.back();
                                 if (scope.widgets[scope.selectedIndex].name == 'Maps'){
                                     $rootScope.visibleWidget = 'map';
+                                }
+                                else if (scope.widgets[scope.selectedIndex].name == 'Folder select'){
+                                    $rootScope.visibleWidget = 'folder-select'
+                                }
+                                else if (scope.widgets[scope.selectedIndex].name == 'Update player'){
+                                    UpdatePlayer.update();
                                 }
                             },
                             up: function(){
@@ -33621,6 +33708,7 @@ app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'S
                  })
 
             },
+            scope: {},
             template: '<select-list selected-index="selectedIndex" all-items="widgets"></select-list>'
             //template: '<ul><li ng-repeat="file in visibleFiles track by $index" ng-class="{\'selected\': $index== 2}">{{file.name}}</li></ul>'
         }
@@ -33629,7 +33717,7 @@ app.directive('toyotaVideoFileList', ['$rootScope', 'VideoPlayer', 'FileList', '
         return{
             link: function(scope, element, attrs){
                 scope.selectedIndex  = 0;
-                scope.$watch(attrs.ngShow, function(showAttr){
+                $rootScope.$watch(attrs.ngShow, function(showAttr){
                     if (showAttr){
                         scope.selectedIndex = VideoPlayer.getCurrentIndex();
                         StateManager.takeOver({
@@ -33666,13 +33754,14 @@ app.directive('toyotaVideoFileList', ['$rootScope', 'VideoPlayer', 'FileList', '
                                 }
 
                                 $rootScope.files = shuffleArray($rootScope.files);
-                                $rootScope.$apply();
                             }
                         });
                     }
                  })
             },
-            template: '<select-list selected-index="selectedIndex" all-items="files"></select-list>'
+            scope: {
+            },
+            template: '<select-list selected-index="selectedIndex" all-items="$parent.files"></select-list>'
             //template: '<ul><li ng-repeat="file in visibleFiles track by $index" ng-class="{\'selected\': $index== 2}">{{file.name}}</li></ul>'
         }
     }])
@@ -33693,11 +33782,13 @@ app.directive('toyotaVideoPlayer', ['$rootScope', 'VideoPlayer', function($rootS
     }])
 app.factory('FileList', ['$http', '$q', function($http, $q){
         var files = [];
-        
+        var selectedFolderName = 'USA';
+        var folders = [];
+
         return {
             init: function(){
                 return $q(function(resolve){
-                    $http.get('files').then(function(response){
+                    $http.get('files/' + selectedFolderName).then(function(response){
                         files = response.data;
                         resolve(files);
                     })
@@ -33709,6 +33800,17 @@ app.factory('FileList', ['$http', '$q', function($http, $q){
             },
             randomize: function(){
 
+            },
+            getFolders: function(){
+                return $q(function(resolve){
+                    $http.get('folders').then(function(response){
+                        folders = response.data;
+                        resolve(folders);
+                    })
+                })
+            },
+            selectFolder: function(folder){
+                selectedFolderName = folder;
             }
         }
     }])
@@ -33757,6 +33859,17 @@ app.factory('StateManager', ['$rootScope', function($rootScope){
             },
             setState: function(s){
                 states.push(s);
+            }
+        }
+    }])
+app.factory('UpdatePlayer', ['$http', '$q', function($http, $q){
+        
+
+        return {
+            update: function(){
+                $http.get('get-latest').then(function(response){
+                    resolve(response.data);
+                })
             }
         }
     }])

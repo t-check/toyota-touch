@@ -36,7 +36,7 @@ app.directive('selectList', ['$rootScope',  function($rootScope){
                     calculateVisibleItems();
                 })
 
-                scope.$watch('allItems', function(allItems){
+                scope.$watchCollection('allItems', function(allItems){
                     scope.allItems = allItems;
                     calculateVisibleItems();
                 })

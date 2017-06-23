@@ -7,7 +7,8 @@ app.directive('toyotaMapViewer', ['$rootScope', 'VideoPlayer', 'FileList', 'Stat
 
         return{
             link: function(scope, element, attrs){
-                scope.$watch(attrs.ngShow, function(showAttr){
+                scope.zoomMapVisible = false;
+                $rootScope.$watch(attrs.ngShow, function(showAttr){
                     if (showAttr && !mapLoaded){
                         map = new google.maps.Map(document.getElementById('google-map'), {
                             center: {lat: lat, lng: lon},
@@ -25,19 +26,27 @@ app.directive('toyotaMapViewer', ['$rootScope', 'VideoPlayer', 'FileList', 'Stat
                         StateManager.takeOver({
                             name: 'map',
                             ok: function(){
-                                StateManager.back();
-                                if (scope.widgets[scope.selectedIndex].name == 'Maps'){
-                                    $rootScope.visibleWidget = 'map';
-                                }
+                                scope.zoomMapVisible = !scope.zoomMapVisible;
                             },
                             up: function(){
                                 //lat = lat + 150.55 / (591657550.500000 / Math.pow(2, zoom-1));
-                                
-                                map.panBy(0, -200);
+                                if (!scope.zoomMapVisible){
+                                    map.panBy(0, -200);
+                                }
+                                else{
+                                    zoom++;
+                                    map.setZoom(zoom);
+                                }
 
                             },
                             down: function(){
-                                map.panBy(0, 200);
+                                if (!scope.zoomMapVisible){
+                                    map.panBy(0, 200);
+                                }
+                                else{
+                                    zoom--;
+                                    map.setZoom(zoom);
+                                }
                             },
                             left: function(){
                                 map.panBy(-200, 0);
@@ -52,6 +61,7 @@ app.directive('toyotaMapViewer', ['$rootScope', 'VideoPlayer', 'FileList', 'Stat
 
                 
             },
-            template: '<div id="google-map"></div>'
+            scope:{},
+            template: '<div ng-show="zoomMapVisible" style="z-index: 999;background-color: rgba(0,0,0,0.4);">UP: Zoom in<br/>DOWN: Zoom out<br/>OK: return</div><div id="google-map"></div>'
         }
     }])

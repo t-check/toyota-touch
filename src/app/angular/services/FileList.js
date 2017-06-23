@@ -1,10 +1,12 @@
 app.factory('FileList', ['$http', '$q', function($http, $q){
         var files = [];
-        
+        var selectedFolderName = 'USA';
+        var folders = [];
+
         return {
             init: function(){
                 return $q(function(resolve){
-                    $http.get('files').then(function(response){
+                    $http.get('files/' + selectedFolderName).then(function(response){
                         files = response.data;
                         resolve(files);
                     })
@@ -16,6 +18,17 @@ app.factory('FileList', ['$http', '$q', function($http, $q){
             },
             randomize: function(){
 
+            },
+            getFolders: function(){
+                return $q(function(resolve){
+                    $http.get('folders').then(function(response){
+                        folders = response.data;
+                        resolve(folders);
+                    })
+                })
+            },
+            selectFolder: function(folder){
+                selectedFolderName = folder;
             }
         }
     }])

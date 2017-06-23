@@ -1,14 +1,14 @@
-app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'StateManager',  function($rootScope, VideoPlayer, FileList, StateManager){
+app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'StateManager', 'UpdatePlayer',  function($rootScope, VideoPlayer, FileList, StateManager, UpdatePlayer){
         return{
             link: function(scope, element, attrs){
                 scope.widgets = [
                     {name: 'Maps'},
                     {name: 'Folder select'},
-                    {name: 'None'},
-                    {name: 'None'}
+                    {name: 'Update player'},
+                    {name: 'Reboot player'}
                 ]
                 scope.selectedIndex  = 0;
-                scope.$watch(attrs.ngShow, function(showAttr){
+                $rootScope.$watch(attrs.ngShow, function(showAttr){
                     if (showAttr){
                         scope.selectedIndex = VideoPlayer.getCurrentIndex();
                         StateManager.takeOver({
@@ -17,6 +17,12 @@ app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'S
                                 StateManager.back();
                                 if (scope.widgets[scope.selectedIndex].name == 'Maps'){
                                     $rootScope.visibleWidget = 'map';
+                                }
+                                else if (scope.widgets[scope.selectedIndex].name == 'Folder select'){
+                                    $rootScope.visibleWidget = 'folder-select'
+                                }
+                                else if (scope.widgets[scope.selectedIndex].name == 'Update player'){
+                                    UpdatePlayer.update();
                                 }
                             },
                             up: function(){
@@ -40,6 +46,7 @@ app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'S
                  })
 
             },
+            scope: {},
             template: '<select-list selected-index="selectedIndex" all-items="widgets"></select-list>'
             //template: '<ul><li ng-repeat="file in visibleFiles track by $index" ng-class="{\'selected\': $index== 2}">{{file.name}}</li></ul>'
         }

@@ -28,6 +28,8 @@ app.directive('toyotaApp', ['$rootScope', 'StateManager', 'VideoPlayer', functio
             template: '<toyota-video-player></toyota-video-player>\
                 <toyota-video-file-list ng-show="visibleWidget==\'fileList\'"></toyota-video-file-list>\
                 <toyota-map-viewer ng-show="visibleWidget==\'map\'"></toyota-map-viewer>\
-                <toyota-select-widget ng-show="visibleWidget==\'selectWidget\'" class="fs-toyota"></toyota-select-widget>'
+                <toyota-select-widget ng-show="visibleWidget==\'selectWidget\'" class="fs-toyota"></toyota-select-widget>\
+                <toyota-folder-select-widget ng-show="visibleWidget==\'folder-select\'" class="fs-toyota"></toyota-folder-select-widget>\
+                <div>{{visibleWidget}}</div>'
         }
     }])
