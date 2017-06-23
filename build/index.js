@@ -62,6 +62,10 @@ app.get('/get-latest', function(req, res){
     exec("git -C \"Desktop/toyota-touch\" pull", puts);
 })
 
+app.get('/reboot', function(req,res){
+    exec("sudo shutdown -r now");
+})
+
 app.use('/media-file', express.static('/media/pi/9CC8BB5BC8BB327E'));
 
 app.listen(3333, function () {

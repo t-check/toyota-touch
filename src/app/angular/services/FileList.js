@@ -29,6 +29,9 @@ app.factory('FileList', ['$http', '$q', function($http, $q){
             },
             selectFolder: function(folder){
                 selectedFolderName = folder;
+            },
+            getFolder: function(){
+                return selectedFolderName;
             }
         }
     }])

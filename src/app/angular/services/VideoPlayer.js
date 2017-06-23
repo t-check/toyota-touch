@@ -12,7 +12,7 @@ app.factory('VideoPlayer', ['FileList', function(FileList){
             setVideoElement: setVideoElement,
             playVideo: function(index){
                 currentIndex = index;
-                videoElement.src = '/media-file/' + FileList.getFiles()[index].name;
+                videoElement.src = '/media-file/' + FileList.getFolder() + '/'  + FileList.getFiles()[index].name;
             },
             getCurrentIndex: function(){
                 return currentIndex;
