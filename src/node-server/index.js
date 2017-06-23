@@ -50,9 +50,17 @@ app.get('/files/:folderName', function(req, res){
 
 app.get('/folders', function(req, res){
     var folderList = [];
+    function getDirectories (srcpath) {
+        return fs.readdirSync(srcpath)
+            .filter(file => fs.lstatSync(path.join(srcpath, file)).isDirectory())
+    }
 
+    var directories = getDirectories('/media/pi/9CC8BB5BC8BB327E');
+    var dItems = directories.map(function(d){
+        return {name: d};
+    })
     res.writeHead(200, {'Content-Type': 'application/javascript'});
-    res.write(JSON.stringify([{"name":"USA"},{"name":"Domace"},{"name":"Strano"}]));
+    res.write(JSON.stringify(dItems));
     res.end();
 })
 
