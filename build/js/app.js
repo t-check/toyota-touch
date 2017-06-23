@@ -33778,6 +33778,7 @@ app.directive('toyotaVideoPlayer', ['$rootScope', 'VideoPlayer', function($rootS
                     // play next file
                 }
             },
+            scope: {},
             template: '<video autoplay>\
                 <source type="video/mp4"/>\
             </video>'
