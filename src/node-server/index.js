@@ -62,7 +62,7 @@ app.get('/get-latest', function(req, res){
     exec("git -C \"Desktop/toyota-touch\" pull", puts);
 })
 
-app.use('/media-file', express.static('/Users/tomislavhorvaticek/Downloads'));
+app.use('/media-file', express.static('/media/pi/9CC8BB5BC8BB327E'));
 
 app.listen(3333, function () {
   console.log('Example app listening on port 3333!')
