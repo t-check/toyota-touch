@@ -33448,6 +33448,129 @@ app.run(['$rootScope', 'FileList', 'VideoPlayer', 'StateManager', function( $roo
         })
     })
 }])
+app.factory('FileList', ['$http', '$q', function($http, $q){
+        var files = [];
+        var selectedFolderName = 'USA';
+        var folders = [];
+
+        return {
+            init: function(){
+                return $q(function(resolve){
+                    $http.get('files/' + selectedFolderName).then(function(response){
+                        files = response.data;
+                        resolve(files);
+                    })
+                })
+                
+            },
+            getFiles: function(){
+                return files
+            },
+            randomize: function(){
+
+            },
+            getFolders: function(){
+                return $q(function(resolve){
+                    $http.get('folders').then(function(response){
+                        folders = response.data;
+                        resolve(folders);
+                    })
+                })
+            },
+            selectFolder: function(folder){
+                selectedFolderName = folder;
+            },
+            getFolder: function(){
+                return selectedFolderName;
+            }
+        }
+    }])
+app.factory('StateManager', ['$rootScope', function($rootScope){
+        var states = [];
+        $rootScope.stateName = '';
+        var state = {};
+        
+        return {
+            ok: function(){
+                state.ok();
+            },
+            up: function(){
+                state.up();
+            },
+            down: function(){
+                state.down();
+            },
+            left: function(){
+                state.left();
+            },
+            right: function(){
+                state.right();
+            },
+            back: function(){
+                if (states.length > 1){
+                    states.pop();
+                    $rootScope.visibleWidget = state.name;
+                }
+            },
+            moveToState: function(sn){
+                states.push(sn);
+                //lastState = state;
+                //$rootScope.stateName = sn;
+            },
+            takeOver: function(s){
+                states.push(s);
+                //state = s;
+                $rootScope.stateName = s.name;
+            },
+            getStateName: function(){
+                return state.name;
+            },
+            getState: function(){
+                return states[states.length -1];
+            },
+            setState: function(s){
+                states.push(s);
+            }
+        }
+    }])
+app.factory('UpdatePlayer', ['$http', '$q', function($http, $q){
+        
+
+        return {
+            update: function(){
+                $http.get('get-latest').then(function(response){
+                    resolve(response.data);
+                })
+            },
+            reboot: function(){
+                $http.get('reboot').then(function(response){
+                    resolve(response.data);
+                })
+            }
+        }
+    }])
+app.factory('VideoPlayer', ['FileList', function(FileList){
+        var videoElement = null;
+        var getVideoElement = function(){
+            return videoElement;
+        }
+        var setVideoElement = function(element){
+            videoElement  = element;
+        }
+        var currentIndex = 0;
+        return {
+            getVideoElement: getVideoElement,
+            setVideoElement: setVideoElement,
+            playVideo: function(index){
+                currentIndex = index;
+                videoElement.src = '/media-file/' + FileList.getFolder() + '/'  + FileList.getFiles()[index].name;
+            },
+            getCurrentIndex: function(){
+                return currentIndex;
+            }
+
+        }
+    }])
 app.directive('selectList', ['$rootScope',  function($rootScope){
         return{
             link: function(scope, element, attrs){
@@ -33551,7 +33674,19 @@ app.directive('toyotaFolderSelectWidget', ['$rootScope', 'FileList', 'StateManag
                                 StateManager.back();
                                 FileList.selectFolder(scope.folders[scope.selectedIndex].name);
                                 FileList.init().then(function(f){
-                                    $rootScope.files = f;
+                                    var shuffleArray = function (array) {
+                                        for (var i = array.length - 1; i > 0; i--) {
+                                            var j = Math.floor(Math.random() * (i + 1));
+                                            var temp = array[i];
+                                            array[i] = array[j];
+                                            array[j] = temp;
+                                        }
+                                        return array;
+                                    }
+                                    $rootScope.files = shuffleArray(f);
+                                    $rootScope.selectedFileIndex = 0;
+                                    $rootScope.playVideo(0);
+                                    //$rootScope.files = f;
                                 })
                             },
                             up: function(){
@@ -33782,128 +33917,5 @@ app.directive('toyotaVideoPlayer', ['$rootScope', 'VideoPlayer', function($rootS
             template: '<video autoplay>\
                 <source type="video/mp4"/>\
             </video>'
-        }
-    }])
-app.factory('FileList', ['$http', '$q', function($http, $q){
-        var files = [];
-        var selectedFolderName = 'USA';
-        var folders = [];
-
-        return {
-            init: function(){
-                return $q(function(resolve){
-                    $http.get('files/' + selectedFolderName).then(function(response){
-                        files = response.data;
-                        resolve(files);
-                    })
-                })
-                
-            },
-            getFiles: function(){
-                return files
-            },
-            randomize: function(){
-
-            },
-            getFolders: function(){
-                return $q(function(resolve){
-                    $http.get('folders').then(function(response){
-                        folders = response.data;
-                        resolve(folders);
-                    })
-                })
-            },
-            selectFolder: function(folder){
-                selectedFolderName = folder;
-            },
-            getFolder: function(){
-                return selectedFolderName;
-            }
-        }
-    }])
-app.factory('StateManager', ['$rootScope', function($rootScope){
-        var states = [];
-        $rootScope.stateName = '';
-        var state = {};
-        
-        return {
-            ok: function(){
-                state.ok();
-            },
-            up: function(){
-                state.up();
-            },
-            down: function(){
-                state.down();
-            },
-            left: function(){
-                state.left();
-            },
-            right: function(){
-                state.right();
-            },
-            back: function(){
-                if (states.length > 1){
-                    states.pop();
-                    $rootScope.visibleWidget = state.name;
-                }
-            },
-            moveToState: function(sn){
-                states.push(sn);
-                //lastState = state;
-                //$rootScope.stateName = sn;
-            },
-            takeOver: function(s){
-                states.push(s);
-                //state = s;
-                $rootScope.stateName = s.name;
-            },
-            getStateName: function(){
-                return state.name;
-            },
-            getState: function(){
-                return states[states.length -1];
-            },
-            setState: function(s){
-                states.push(s);
-            }
-        }
-    }])
-app.factory('UpdatePlayer', ['$http', '$q', function($http, $q){
-        
-
-        return {
-            update: function(){
-                $http.get('get-latest').then(function(response){
-                    resolve(response.data);
-                })
-            },
-            reboot: function(){
-                $http.get('reboot').then(function(response){
-                    resolve(response.data);
-                })
-            }
-        }
-    }])
-app.factory('VideoPlayer', ['FileList', function(FileList){
-        var videoElement = null;
-        var getVideoElement = function(){
-            return videoElement;
-        }
-        var setVideoElement = function(element){
-            videoElement  = element;
-        }
-        var currentIndex = 0;
-        return {
-            getVideoElement: getVideoElement,
-            setVideoElement: setVideoElement,
-            playVideo: function(index){
-                currentIndex = index;
-                videoElement.src = '/media-file/' + FileList.getFolder() + '/'  + FileList.getFiles()[index].name;
-            },
-            getCurrentIndex: function(){
-                return currentIndex;
-            }
-
         }
     }])
