@@ -24,6 +24,9 @@ app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'S
                                 else if (scope.widgets[scope.selectedIndex].name == 'Update player'){
                                     UpdatePlayer.update();
                                 }
+                                else if(scope.widgets[scope.selectedIndex].name == 'Reboot player'){
+                                    UpdatePlayer.reboot();
+                                }
                             },
                             up: function(){
                                 scope.selectedIndex--;
