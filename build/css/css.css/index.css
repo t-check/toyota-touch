@@ -905,6 +905,7 @@ toyota-video-file-list ul,
 toyota-map-viewer ul,
 toyota-map-viewer > div ul,
 .fs-toyota ul {
+  margin-top: 60px;
   width: 100%;
   height: 100%;
   margin: 0;
@@ -918,8 +919,8 @@ toyota-video-file-list ul li,
 toyota-map-viewer ul li,
 toyota-map-viewer > div ul li,
 .fs-toyota ul li {
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 24px;
+  margin-bottom: 24px;
   height: 35px;
   width: 1000px;
   font-size: 30px;
