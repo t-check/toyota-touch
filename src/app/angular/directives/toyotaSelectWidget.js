@@ -10,7 +10,6 @@ app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'S
                 scope.selectedIndex  = 0;
                 $rootScope.$watch(attrs.ngShow, function(showAttr){
                     if (showAttr){
-                        scope.selectedIndex = VideoPlayer.getCurrentIndex();
                         StateManager.takeOver({
                             name: 'selectWidget',
                             ok: function(){
@@ -36,7 +35,7 @@ app.directive('toyotaSelectWidget', ['$rootScope', 'VideoPlayer', 'FileList', 'S
                             },
                             down: function(){
                                 scope.selectedIndex++;
-                                if (scope.selectedIndex == scope.widgets.length){
+                                if (scope.selectedIndex >= scope.widgets.length){
                                     scope.selectedIndex = 0;
                                 }
                             },

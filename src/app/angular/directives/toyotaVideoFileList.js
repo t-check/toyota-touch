@@ -2,6 +2,7 @@ app.directive('toyotaVideoFileList', ['$rootScope', 'VideoPlayer', 'FileList', '
         return{
             link: function(scope, element, attrs){
                 scope.selectedIndex  = 0;
+                scope.isRandomized = true;
                 $rootScope.$watch(attrs.ngShow, function(showAttr){
                     if (showAttr){
                         scope.selectedIndex = VideoPlayer.getCurrentIndex();
@@ -37,8 +38,21 @@ app.directive('toyotaVideoFileList', ['$rootScope', 'VideoPlayer', 'FileList', '
                                     }
                                     return array;
                                 }
-
-                                $rootScope.files = shuffleArray($rootScope.files);
+                                if (scope.isRandomized){
+                                    $rootScope.files.sort(function(a,b){
+                                        if (a.name.toLowerCase()[0] > b.name.toLowerCase()[0]){
+                                            return 1
+                                        }
+                                        else{
+                                            return -1;
+                                        }
+                                    });
+                                    scope.isRandomized = false;
+                                }
+                                else{
+                                    $rootScope.files = shuffleArray($rootScope.files);
+                                    scope.isRandomized = true;
+                                }
                             }
                         });
                     }
