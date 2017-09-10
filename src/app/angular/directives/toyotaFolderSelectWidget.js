@@ -9,6 +9,9 @@ app.directive('toyotaFolderSelectWidget', ['$rootScope', 'FileList', 'StateManag
 
                 $rootScope.$watch(attrs.ngShow, function(showAttr){
                     if (showAttr){
+                        FileList.getFolders().then(function(d){
+                            scope.folders = d;
+                        })
                         StateManager.takeOver({
                             name: 'folder-select',
                             ok: function(){
