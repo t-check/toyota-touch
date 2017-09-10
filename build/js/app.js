@@ -33448,141 +33448,6 @@ app.run(['$rootScope', 'FileList', 'VideoPlayer', 'StateManager', function( $roo
         })
     })
 }])
-app.factory('FileList', ['$http', '$q', '$rootScope', function($http, $q, $rootScope){
-        var files = [];
-        var selectedFolderName = 'USA';
-        var folders = [];
-        var drives = [];
-
-        return {
-            init: function(){
-                return $q(function(resolve){
-                    $http.get('get-drives').then(function(response){
-                        drives = response.data;
-                        
-                        $http.get('get-default-drive').then(function(result){
-                            $rootScope.defaultDrive = result.data.defaultDrive;
-
-                            $http.get('files/' + result.data.defaultDrive + '/' + selectedFolderName).then(function(response){
-                                files = response.data;
-                                resolve(files);
-                            })
-                        })
-                    });
-                })
-                
-            },
-            getFiles: function(){
-                return files
-            },
-            randomize: function(){
-
-            },
-            getDrives: function(){
-                return drives;
-            },
-            getFolders: function(){
-                return $q(function(resolve){
-                    $http.get('folders/' + $rootScope.defaultDrive).then(function(response){
-                        folders = response.data;
-                        resolve(folders);
-                    })
-                })
-            },
-            selectFolder: function(folder){
-                selectedFolderName = folder;
-            },
-            getFolder: function(){
-                return selectedFolderName;
-            }
-        }
-    }])
-app.factory('StateManager', ['$rootScope', function($rootScope){
-        var states = [];
-        $rootScope.stateName = '';
-        var state = {};
-        
-        return {
-            ok: function(){
-                state.ok();
-            },
-            up: function(){
-                state.up();
-            },
-            down: function(){
-                state.down();
-            },
-            left: function(){
-                state.left();
-            },
-            right: function(){
-                state.right();
-            },
-            back: function(){
-                if (states.length > 1){
-                    states.pop();
-                    $rootScope.visibleWidget = state.name;
-                }
-            },
-            moveToState: function(sn){
-                states.push(sn);
-                //lastState = state;
-                //$rootScope.stateName = sn;
-            },
-            takeOver: function(s){
-                states.push(s);
-                //state = s;
-                $rootScope.stateName = s.name;
-            },
-            getStateName: function(){
-                return state.name;
-            },
-            getState: function(){
-                return states[states.length -1];
-            },
-            setState: function(s){
-                states.push(s);
-            }
-        }
-    }])
-app.factory('UpdatePlayer', ['$http', '$q', function($http, $q){
-        
-
-        return {
-            update: function(){
-                $http.get('get-latest').then(function(response){
-                    resolve(response.data);
-                })
-            },
-            reboot: function(){
-                $http.get('reboot').then(function(response){
-                    resolve(response.data);
-                })
-            }
-        }
-    }])
-app.factory('VideoPlayer', ['FileList', '$rootScope', function(FileList, $rootScope){
-        var videoElement = null;
-        var getVideoElement = function(){
-            return videoElement;
-        }
-        var setVideoElement = function(element){
-            videoElement  = element;
-        }
-        var currentIndex = 0;
-        return {
-            getVideoElement: getVideoElement,
-            setVideoElement: setVideoElement,
-            playVideo: function(index){
-                currentIndex = index;
-                videoElement.src = '/media-file/' $rootScope.defaultDrive + '/' + FileList.getFolder() + '/'  + FileList.getFiles()[index].name;
-            },
-            getCurrentIndex: function(){
-                return currentIndex;
-            }
-
-        }
-    }])
 app.directive('selectList', ['$rootScope',  function($rootScope){
         return{
             link: function(scope, element, attrs){
@@ -33942,5 +33807,140 @@ app.directive('toyotaVideoPlayer', ['$rootScope', 'VideoPlayer', function($rootS
             template: '<video autoplay>\
                 <source type="video/mp4"/>\
             </video>'
+        }
+    }])
+app.factory('FileList', ['$http', '$q', '$rootScope', function($http, $q, $rootScope){
+        var files = [];
+        var selectedFolderName = 'USA';
+        var folders = [];
+        var drives = [];
+
+        return {
+            init: function(){
+                return $q(function(resolve){
+                    $http.get('get-drives').then(function(response){
+                        drives = response.data;
+                        
+                        $http.get('get-default-drive').then(function(result){
+                            $rootScope.defaultDrive = result.data.defaultDrive;
+
+                            $http.get('files/' + result.data.defaultDrive + '/' + selectedFolderName).then(function(response){
+                                files = response.data;
+                                resolve(files);
+                            })
+                        })
+                    });
+                })
+                
+            },
+            getFiles: function(){
+                return files
+            },
+            randomize: function(){
+
+            },
+            getDrives: function(){
+                return drives;
+            },
+            getFolders: function(){
+                return $q(function(resolve){
+                    $http.get('folders/' + $rootScope.defaultDrive).then(function(response){
+                        folders = response.data;
+                        resolve(folders);
+                    })
+                })
+            },
+            selectFolder: function(folder){
+                selectedFolderName = folder;
+            },
+            getFolder: function(){
+                return selectedFolderName;
+            }
+        }
+    }])
+app.factory('StateManager', ['$rootScope', function($rootScope){
+        var states = [];
+        $rootScope.stateName = '';
+        var state = {};
+        
+        return {
+            ok: function(){
+                state.ok();
+            },
+            up: function(){
+                state.up();
+            },
+            down: function(){
+                state.down();
+            },
+            left: function(){
+                state.left();
+            },
+            right: function(){
+                state.right();
+            },
+            back: function(){
+                if (states.length > 1){
+                    states.pop();
+                    $rootScope.visibleWidget = state.name;
+                }
+            },
+            moveToState: function(sn){
+                states.push(sn);
+                //lastState = state;
+                //$rootScope.stateName = sn;
+            },
+            takeOver: function(s){
+                states.push(s);
+                //state = s;
+                $rootScope.stateName = s.name;
+            },
+            getStateName: function(){
+                return state.name;
+            },
+            getState: function(){
+                return states[states.length -1];
+            },
+            setState: function(s){
+                states.push(s);
+            }
+        }
+    }])
+app.factory('UpdatePlayer', ['$http', '$q', function($http, $q){
+        
+
+        return {
+            update: function(){
+                $http.get('get-latest').then(function(response){
+                    resolve(response.data);
+                })
+            },
+            reboot: function(){
+                $http.get('reboot').then(function(response){
+                    resolve(response.data);
+                })
+            }
+        }
+    }])
+app.factory('VideoPlayer', ['FileList', '$rootScope', function(FileList, $rootScope){
+        var videoElement = null;
+        var getVideoElement = function(){
+            return videoElement;
+        }
+        var setVideoElement = function(element){
+            videoElement  = element;
+        }
+        var currentIndex = 0;
+        return {
+            getVideoElement: getVideoElement,
+            setVideoElement: setVideoElement,
+            playVideo: function(index){
+                currentIndex = index;
+                videoElement.src = '/media-file/' + $rootScope.defaultDrive + '/' + FileList.getFolder() + '/'  + FileList.getFiles()[index].name;
+            },
+            getCurrentIndex: function(){
+                return currentIndex;
+            }
+
         }
     }])
