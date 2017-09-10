@@ -33809,18 +33809,27 @@ app.directive('toyotaVideoPlayer', ['$rootScope', 'VideoPlayer', function($rootS
             </video>'
         }
     }])
-app.factory('FileList', ['$http', '$q', function($http, $q){
+app.factory('FileList', ['$http', '$q', '$rootScope', function($http, $q, $rootScope){
         var files = [];
         var selectedFolderName = 'USA';
         var folders = [];
+        var drives = [];
 
         return {
             init: function(){
                 return $q(function(resolve){
-                    $http.get('files/' + selectedFolderName).then(function(response){
-                        files = response.data;
-                        resolve(files);
-                    })
+                    $http.get('get-drives').then(function(response){
+                        drives = response.data;
+                        resolve(drives);
+                        $http.get('get-default-drive').then(function(result){
+                            $rootScope.defaultDrive = result.defaultDrive;
+
+                            $http.get('files/' + result.defaultDrive + '/' + selectedFolderName).then(function(response){
+                                files = response.data;
+                                resolve(files);
+                            })
+                        })
+                    });
                 })
                 
             },
@@ -33830,9 +33839,12 @@ app.factory('FileList', ['$http', '$q', function($http, $q){
             randomize: function(){
 
             },
+            getDrives: function(){
+                return drives;
+            },
             getFolders: function(){
                 return $q(function(resolve){
-                    $http.get('folders').then(function(response){
+                    $http.get('folders/' + $rootScope.defaultDrive).then(function(response){
                         folders = response.data;
                         resolve(folders);
                     })
