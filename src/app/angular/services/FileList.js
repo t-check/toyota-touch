@@ -13,7 +13,7 @@ app.factory('FileList', ['$http', '$q', '$rootScope', function($http, $q, $rootS
                         $http.get('get-default-drive').then(function(result){
                             $rootScope.defaultDrive = result.data.defaultDrive;
 
-                            $http.get('files/' + result.defaultDrive + '/' + selectedFolderName).then(function(response){
+                            $http.get('files/' + result.data.defaultDrive + '/' + selectedFolderName).then(function(response){
                                 files = response.data;
                                 resolve(files);
                             })
