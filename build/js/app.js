@@ -33820,9 +33820,9 @@ app.factory('FileList', ['$http', '$q', '$rootScope', function($http, $q, $rootS
                 return $q(function(resolve){
                     $http.get('get-drives').then(function(response){
                         drives = response.data;
-                        resolve(drives);
+                        
                         $http.get('get-default-drive').then(function(result){
-                            $rootScope.defaultDrive = result.defaultDrive;
+                            $rootScope.defaultDrive = result.data.defaultDrive;
 
                             $http.get('files/' + result.defaultDrive + '/' + selectedFolderName).then(function(response){
                                 files = response.data;
