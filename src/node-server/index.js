@@ -14,19 +14,36 @@ let createServer = function () {
     });
 }
 
-if (fs.existsSync(piRootDirectory)) {
-    // Do something
-    createServer();
-}
-else {
-    piRootDirectory = '/Users/tomislavhorvaticek/Downloads/pifolder'
-    createServer();
-}
+createServer();
+
+let findDirectoryPromise = new Promise(function(resolve, reject) {
+    if (fs.existsSync(piRootDirectory)) {
+        resolve();
+        // Do something
+        //createServer();
+    }
+    else {
+        resolve();
+        piRootDirectory = '/Users/tomislavhorvaticek/Downloads/pifolder'
+        //createServer();
+    }
+})
+
+// if (fs.existsSync(piRootDirectory)) {
+//     // Do something
+//     createServer();
+// }
+// else {
+//     piRootDirectory = '/Users/tomislavhorvaticek/Downloads/pifolder'
+//     createServer();
+// }
 
 app.get('/', function (req, res) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    var fileStream = fs.createReadStream(__dirname + '/index.html');
-    fileStream.pipe(res);
+    findDirectoryPromise.then(function() {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        var fileStream = fs.createReadStream(__dirname + '/index.html');
+        fileStream.pipe(res);
+    })
 });
 
 app.get('/appjs', function(req,res){
@@ -167,7 +184,28 @@ app.get('/reboot', function(req,res){
     exec("sudo shutdown -r now");
 })
 
+let progress = {
+    fileName: '',
+    progress: 0,
+    songsToDownload: 0,
+    downloadedSongs: 0,
+    downloadComplete: false
+};
+
+app.get('/get-update-songs-progress', function(req, res) {
+    res.writeHead(200, {'Content-Type': 'application/javascript'});
+    res.write(JSON.stringify(progress));
+    res.end();
+});
+
 app.get('/update-songs/:drive', function(req, res){
+    progress = {
+        fileName: '',
+        progress: 0,
+        songsToDownload: 0,
+        downloadedSongs: 0,
+        downloadComplete: false
+    };
     var privatekey = require(piRootDirectory + '/' + req.params.drive + '/secret.json');
     var jwtClient = new google.auth.JWT(
         privatekey.client_email,
@@ -181,44 +219,91 @@ app.get('/update-songs/:drive', function(req, res){
             return;
         } else {
             console.log("Google autorization complete");
-            var drive = google.drive({version: 'v3', auth: jwtClient});
+            let drive = google.drive({version: 'v3', auth: jwtClient});
 
-            drive.files.list({
-                auth: jwtClient,
-                pageSize: 10,
-                q: "'1iFmhRqneX2gEfZq9YrLuYkgqoa4MCMlr' in parents and trashed = false",
-                fields: "nextPageToken, files(id, name)"
-            }, function (err, {data}) {
-                if (err) {
-                    console.log(err);
-                // Handle error
-                } else {
-                    console.log('got ok response');
-                    const files = data.files;
-                    const dest = fs.createWriteStream(piRootDirectory + '/Video');
-
-                    if (files.length) {
-                        console.log('Files:');
-                        files.map((file) => {
-                            var dfile = fs.createWriteStream(piRootDirectory + "/" + file.name);
-                            dfile.on("finish", function() {
-                                console.log("downloaded", file.name);
-                            });
-
-                            // Download file
-                            drive.files.get({
-                                auth: jwtClient,
-                                fileId: file.id,
-                                alt: "media"
-                            }).pipe(dfile);
-                        });
-                    }
-                // Success is much harder to handle
-                }
+            downloadSongs(jwtClient, progress, drive, req, '1iFmhRqneX2gEfZq9YrLuYkgqoa4MCMlr', 'Video').then(function(r) {
+                //progress.downloadComplete = true;
+                downloadSongs(jwtClient, progress, drive, req, '17miqqprDEbjlWfKY-9aD6v465YVmUJ1h', 'USA').then(function(r) {
+                    progress.downloadComplete = true;
+                });
             });
         }
       });
 });
+
+let downloadSongs = function(jwtClient, progress, drive, req, folderId, folderName) {
+    let p = new Promise(function(resolve, reject) {
+        drive.files.list({
+            auth: jwtClient,
+            pageSize: 10,
+            q: "'" + folderId + "' in parents and trashed = false",
+            fields: "nextPageToken, files(id, name)"
+        }, function (err, {data}) {
+            if (err) {
+                console.log(err);
+                reject();
+            // Handle error
+            } else {
+                console.log('got ok response', data);
+                const files = data.files;
+                progress.songsToDownload += files.length;
+                //const dest = fs.createWriteStream(piRootDirectory + '/Video');
+    
+                if (files.length) {
+                    console.log('Files:');
+                    let promiseArray = [];
+
+                    files.map((file, fileIndex) => {
+                        progress.fileName = file.name;
+                        const filePath = piRootDirectory + "/" +  req.params.drive + '/'  + folderName + '/' + file.name;
+                        var dest = fs.createWriteStream(filePath);
+                        
+                        
+                        var pr = new Promise (function(resolve, reject) {
+                            drive.files.get(
+                                {fileId: file.id, alt: 'media'},
+                                {responseType: 'stream'},
+                                function(error, res) {
+                                    console.log(res);
+                                    res.data
+                                    .on('end', () => {
+                                        console.log('Done downloading file.');
+                                        progress.downloadedSongs += 1;
+                                        resolve();
+                                        //resolve(filePath);
+                                    })
+                                    .on('error', err => {
+                                        console.error('Error downloading file.');
+                                        //reject(err);
+                                        reject();
+                                    })
+                                    .on('data', d => {
+                                        process.stdout.clearLine();
+                                        process.stdout.cursorTo(0);
+                                    })
+                                    .pipe(dest);
+                                }
+                            );
+                        });
+
+                        promiseArray.push(pr);
+                    });
+
+                    Promise.all(promiseArray).then(function(v) {
+                        resolve();
+                    });
+                }
+                else {
+                    resolve();
+                }
+            // Success is much harder to handle
+            }
+        });
+        
+    });
+
+    return p;
+}
 
 app.get('/media-file/:drive/*', function(req, res){
     var drive = req.params.drive,

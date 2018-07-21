@@ -1,4 +1,4 @@
-app.factory('UpdatePlayer', ['$http', '$q', function($http, $q){
+app.factory('UpdatePlayer', ['$http', '$q', '$rootScope', function($http, $q, $rootScope){
         
 
         return {
@@ -11,6 +11,20 @@ app.factory('UpdatePlayer', ['$http', '$q', function($http, $q){
                 $http.get('reboot').then(function(response){
                     resolve(response.data);
                 })
+            },
+            getNewSongs: function() {
+                $http.get('update-songs/' + $rootScope.defaultDrive).then(function(response) {
+                    resolve(response.data);
+                })
+            },
+            getSongStatus: function() {
+                var p = new Promise(function(resolve, reject) {
+                    $http.get('get-update-songs-progress' ).then(function(response) {
+                        resolve(response.data);
+                    })
+                });
+
+                return p;
             }
         }
     }])
